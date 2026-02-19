@@ -1,0 +1,496 @@
+[
+  {
+    "subject_id": "P000",
+    "visit_id": "EP000_000",
+    "clinical_data": {
+      "HR": 72.0,
+      "RR": 18.0,
+      "Temp": 36.9,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P000",
+    "visit_id": "EP000_001",
+    "clinical_data": {
+      "HR": 62.0,
+      "RR": 14.0,
+      "Temp": 37.4,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P000",
+    "visit_id": "EP000_002",
+    "clinical_data": {
+      "HR": 117.0,
+      "RR": 28.0,
+      "Temp": 38.0,
+      "Lactate": 3.0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP000_002 (ID: ORD-2624, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP000_002 (ID: ORD-8657, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP000_002 (ID: ORD-1092, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP000_002 (ID: ORD-2401, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 117.0 (Importance: 0.76)\n- RR: 28.0 (Importance: 0.19)\n- Lactate: 3.0 (Importance: 0.03)\n- Temp: 38.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P001",
+    "visit_id": "EP001_000",
+    "clinical_data": {
+      "HR": 78.0,
+      "RR": 16.0,
+      "Temp": 36.7,
+      "Lactate": 0.8
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P001",
+    "visit_id": "EP001_001",
+    "clinical_data": {
+      "HR": 113.0,
+      "RR": 24.0,
+      "Temp": 39.0,
+      "Lactate": 3.6
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Obtain Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP001_001 (ID: ORD-6137, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP001_001 (ID: ORD-1295, Status: success)",
+      "Order 'Obtain Blood Cultures' placed for visit EP001_001 (ID: ORD-6157, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP001_001 (ID: ORD-4511, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 113.0 (Importance: 0.77)\n- RR: 24.0 (Importance: 0.14)\n- Lactate: 3.6 (Importance: 0.05)\n- Temp: 39.0 (Importance: 0.04)\n"
+  },
+  {
+    "subject_id": "P002",
+    "visit_id": "EP002_000",
+    "clinical_data": {
+      "HR": 73.0,
+      "RR": 19.0,
+      "Temp": 36.5,
+      "Lactate": 1.0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P002",
+    "visit_id": "EP002_001",
+    "clinical_data": {
+      "HR": 100.0,
+      "RR": 25.0,
+      "Temp": 38.9,
+      "Lactate": 0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP002_001 (ID: ORD-1309, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP002_001 (ID: ORD-2889, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP002_001 (ID: ORD-9209, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP002_001 (ID: ORD-2739, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 100.0 (Importance: 0.72)\n- RR: 25.0 (Importance: 0.21)\n- Temp: 38.9 (Importance: 0.05)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P003",
+    "visit_id": "EP003_000",
+    "clinical_data": {
+      "HR": 65.0,
+      "RR": 12.0,
+      "Temp": 37.4,
+      "Lactate": 1.1
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P003",
+    "visit_id": "EP003_001",
+    "clinical_data": {
+      "HR": 100.0,
+      "RR": 22.0,
+      "Temp": 39.1,
+      "Lactate": 0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP003_001 (ID: ORD-4764, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_001 (ID: ORD-5130, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP003_001 (ID: ORD-6868, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP003_001 (ID: ORD-6906, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 100.0 (Importance: 0.77)\n- RR: 22.0 (Importance: 0.15)\n- Temp: 39.1 (Importance: 0.05)\n- Lactate: 0.0 (Importance: 0.03)\n"
+  },
+  {
+    "subject_id": "P004",
+    "visit_id": "EP004_000",
+    "clinical_data": {
+      "HR": 78.0,
+      "RR": 17.0,
+      "Temp": 36.8,
+      "Lactate": 1.5
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P004",
+    "visit_id": "EP004_001",
+    "clinical_data": {
+      "HR": 108.0,
+      "RR": 27.0,
+      "Temp": 39.7,
+      "Lactate": 4.1
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP004_001 (ID: ORD-7844, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP004_001 (ID: ORD-1566, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP004_001 (ID: ORD-5585, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP004_001 (ID: ORD-6170, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 108.0 (Importance: 0.69)\n- RR: 27.0 (Importance: 0.20)\n- Lactate: 4.1 (Importance: 0.06)\n- Temp: 39.7 (Importance: 0.05)\n"
+  },
+  {
+    "subject_id": "P004",
+    "visit_id": "EP004_002",
+    "clinical_data": {
+      "HR": 77.0,
+      "RR": 17.0,
+      "Temp": 37.5,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P004",
+    "visit_id": "EP004_003",
+    "clinical_data": {
+      "HR": 84.0,
+      "RR": 15.0,
+      "Temp": 36.9,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P005",
+    "visit_id": "EP005_000",
+    "clinical_data": {
+      "HR": 96.0,
+      "RR": 29.0,
+      "Temp": 38.8,
+      "Lactate": 3.2
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP005_000 (ID: ORD-6857, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP005_000 (ID: ORD-1978, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP005_000 (ID: ORD-2081, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP005_000 (ID: ORD-6893, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 96.0 (Importance: 0.60)\n- RR: 29.0 (Importance: 0.30)\n- Lactate: 3.2 (Importance: 0.05)\n- Temp: 38.8 (Importance: 0.04)\n"
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_000",
+    "clinical_data": {
+      "HR": 118.0,
+      "RR": 22.0,
+      "Temp": 39.4,
+      "Lactate": 0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP006_000 (ID: ORD-8713, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP006_000 (ID: ORD-4740, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP006_000 (ID: ORD-4353, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP006_000 (ID: ORD-7796, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 118.0 (Importance: 0.84)\n- RR: 22.0 (Importance: 0.10)\n- Temp: 39.4 (Importance: 0.04)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_001",
+    "clinical_data": {
+      "HR": 117.0,
+      "RR": 28.0,
+      "Temp": 38.5,
+      "Lactate": 3.4
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP006_001 (ID: ORD-2293, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP006_001 (ID: ORD-9369, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP006_001 (ID: ORD-3136, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP006_001 (ID: ORD-5631, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 117.0 (Importance: 0.75)\n- RR: 28.0 (Importance: 0.19)\n- Lactate: 3.4 (Importance: 0.04)\n- Temp: 38.5 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_002",
+    "clinical_data": {
+      "HR": 66.0,
+      "RR": 13.0,
+      "Temp": 36.6,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_003",
+    "clinical_data": {
+      "HR": 83.0,
+      "RR": 19.0,
+      "Temp": 37.5,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P007",
+    "visit_id": "EP007_000",
+    "clinical_data": {
+      "HR": 116.0,
+      "RR": 24.0,
+      "Temp": 38.5,
+      "Lactate": 0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP007_000 (ID: ORD-7737, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP007_000 (ID: ORD-5391, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP007_000 (ID: ORD-5525, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP007_000 (ID: ORD-5050, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 116.0 (Importance: 0.81)\n- RR: 24.0 (Importance: 0.14)\n- Temp: 38.5 (Importance: 0.03)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P007",
+    "visit_id": "EP007_001",
+    "clinical_data": {
+      "HR": 89.0,
+      "RR": 19.0,
+      "Temp": 37.5,
+      "Lactate": 0.8
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P008",
+    "visit_id": "EP008_000",
+    "clinical_data": {
+      "HR": 60.0,
+      "RR": 20.0,
+      "Temp": 36.7,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P008",
+    "visit_id": "EP008_001",
+    "clinical_data": {
+      "HR": 97.0,
+      "RR": 27.0,
+      "Temp": 38.7,
+      "Lactate": 4.3
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP008_001 (ID: ORD-5988, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_001 (ID: ORD-7725, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP008_001 (ID: ORD-4491, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP008_001 (ID: ORD-1248, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 97.0 (Importance: 0.63)\n- RR: 27.0 (Importance: 0.26)\n- Lactate: 4.3 (Importance: 0.08)\n- Temp: 38.7 (Importance: 0.04)\n"
+  },
+  {
+    "subject_id": "P008",
+    "visit_id": "EP008_002",
+    "clinical_data": {
+      "HR": 95.0,
+      "RR": 22.0,
+      "Temp": 39.5,
+      "Lactate": 2.9
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP008_002 (ID: ORD-2535, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_002 (ID: ORD-2308, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP008_002 (ID: ORD-6680, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP008_002 (ID: ORD-8772, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 95.0 (Importance: 0.71)\n- RR: 22.0 (Importance: 0.17)\n- Temp: 39.5 (Importance: 0.07)\n- Lactate: 2.9 (Importance: 0.05)\n"
+  },
+  {
+    "subject_id": "P008",
+    "visit_id": "EP008_003",
+    "clinical_data": {
+      "HR": 110.0,
+      "RR": 26.0,
+      "Temp": 39.4,
+      "Lactate": 0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP008_003 (ID: ORD-2815, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_003 (ID: ORD-5270, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP008_003 (ID: ORD-3067, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP008_003 (ID: ORD-5757, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 110.0 (Importance: 0.75)\n- RR: 26.0 (Importance: 0.19)\n- Temp: 39.4 (Importance: 0.04)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P008",
+    "visit_id": "EP008_004",
+    "clinical_data": {
+      "HR": 75.0,
+      "RR": 16.0,
+      "Temp": 36.7,
+      "Lactate": 0
+    },
+    "alert_triggered": false,
+    "plan": [],
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P009",
+    "visit_id": "EP009_000",
+    "clinical_data": {
+      "HR": 112.0,
+      "RR": 29.0,
+      "Temp": 39.5,
+      "Lactate": 4.0
+    },
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid",
+      "Order Blood Cultures",
+      "Administer Broad-Spectrum Antibiotics"
+    ],
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP009_000 (ID: ORD-6236, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP009_000 (ID: ORD-6259, Status: success)",
+      "Order 'Order Blood Cultures' placed for visit EP009_000 (ID: ORD-4579, Status: success)",
+      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP009_000 (ID: ORD-9601, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 112.0 (Importance: 0.69)\n- RR: 29.0 (Importance: 0.21)\n- Lactate: 4.0 (Importance: 0.05)\n- Temp: 39.5 (Importance: 0.04)\n"
+  }
+]

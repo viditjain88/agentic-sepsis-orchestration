@@ -1,0 +1,25 @@
+Sepsis-3 Definitions and Clinical Criteria
+
+Sepsis is defined as life-threatening organ dysfunction caused by a dysregulated host response to infection.
+
+1. Organ Dysfunction
+   - Represented by an increase in the Sequential Organ Failure Assessment (SOFA) score of 2 points or more.
+   - For patients with infections, an increase of 2 SOFA points is associated with an in-hospital mortality greater than 10%.
+
+2. Clinical Criteria for Screening (qSOFA)
+   - Altered mental status (Glasgow Coma Scale < 15)
+   - Fast respiratory rate (>= 22 breaths/min)
+   - Low blood pressure (systolic blood pressure <= 100 mmHg)
+
+3. Septic Shock
+   - A subset of sepsis in which underlying circulatory and cellular/metabolic abnormalities are profound enough to substantially increase mortality.
+   - Clinical criteria:
+     - Persisting hypotension requiring vasopressors to maintain MAP >= 65 mmHg
+     - Serum lactate level > 2 mmol/L (18 mg/dL) despite adequate volume resuscitation.
+
+4. The Sepsis Bundle (Hour-1 Bundle)
+   - Measure lactate level. Remeasure if initial lactate is > 2 mmol/L.
+   - Obtain blood cultures before administering antibiotics.
+   - Administer broad-spectrum antibiotics.
+   - Begin rapid administration of 30mL/kg crystalloid for hypotension or lactate >= 4 mmol/L.
+   - Apply vasopressors if hypotensive during or after fluid resuscitation to maintain MAP >= 65 mmHg.

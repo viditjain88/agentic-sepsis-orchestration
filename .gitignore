@@ -1,0 +1,5 @@
+output/
+__pycache__/
+*.log
+install_ollama.sh
+synthea-with-dependencies.jar

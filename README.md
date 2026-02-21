@@ -2,6 +2,16 @@
 
 This project implements an **Agentic Framework** for early sepsis detection and management using synthetic patient data. The system is designed to simulate a real-world clinical workflow where digital agents monitor vital signs, generate treatment plans based on Sepsis-3 guidelines, and execute orders via a mock FHIR interface.
 
+**Subtitle:** *Agentic Sepsis Orchestration: End-to-End Detection, Planning, and Action in a Synthetic EHR Workflow*
+
+## 🎯 Objective
+
+Build an end-to-end, agentic sepsis workflow that (1) screens patients using Sepsis-3 criteria, (2) generates guideline-consistent bundle orders via RAG + LLM, (3) executes mock FHIR actions, and (4) explains alerts with feature-importance signals.
+
+## 🧾 Abstract / Motivation
+
+Sepsis care requires rapid, coordinated decisions. This PoC demonstrates an agentic pipeline that unifies monitoring, planning, execution, and verification. On synthetic EHR data, the system produces clinically coherent bundles while maintaining high detection performance and measurable response latency.
+
 ## 🚀 Project Overview
 
 The goal of this Proof-of-Concept (PoC) is to demonstrate the capabilities of an agentic system in a healthcare setting. Specifically, it aims to:
@@ -38,6 +48,32 @@ The architecture follows a modular pipeline:
         *   **ECE:** Expected Calibration Error (Safety metric).
         *   **Latency:** System response time.
     *   It also generates visual assets for reporting (`shap_importance_plot.png`, `response_time_comparison.png`).
+
+## 🧪 Methods
+
+- **Cohort:** 200 synthetic patients, 558 encounters/visits.
+- **Perceptor:** Rule-based screening (HR>90, RR≥22, Temp>38, Lactate>2).
+- **Planner:** RAG + LLM (Ollama/Gemma) to produce Sepsis bundle orders.
+- **Executor:** Mock FHIR order placement.
+- **Verifier:** SHAP-proxy feature importance.
+- **Evaluation:** AUROC, AUPRC, ECE, simulated latency.
+
+## 📈 Results / Discussion (Latest Run)
+
+- **Alerts:** 274 / 558 visits (49.1%).
+- **AUROC:** 0.9795
+- **AUPRC:** 0.9549
+- **ECE:** 0.0810
+- **Avg Latency:** 3.47 s (simulated)
+
+Orders consistently aligned with the Sepsis bundle (fluids, antibiotics, lactate redraw, cultures), supporting clinical plausibility in this PoC setting.
+
+## 🖼️ Latest Figures / Assets
+
+- `output/response_time_comparison.png` (latency comparison)
+- `output/shap_importance_plot.png` (global feature importance)
+- `output/pipeline_diagram.png` (system overview)
+- `output/Agentic_Sepsis_Poster.pptx` (filled poster template)
 
 ## 🤖 Agent Roles
 
@@ -104,8 +140,4 @@ Feature Importance Analysis (SHAP-proxy):
 
 ## 📈 Results (PoC Batch)
 
-- **AUROC:** ~0.95
-- **AUPRC:** ~0.89
-- **Latency:** ~3.6s (avg)
-
-*Note: Metrics are based on a small synthetic batch and simulated latency.*
+See **Results / Discussion (Latest Run)** above for current metrics and figures.

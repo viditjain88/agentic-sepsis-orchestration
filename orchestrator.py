@@ -4,19 +4,49 @@ from typing import List, Dict, Any, Union, TypedDict
 from langchain_community.llms import Ollama
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
-from langgraph.graph import StateGraph, END
 from agents import PerceptorAgent, ExecutorAgent, VerifierAgent
+
+LANGGRAPH_AVAILABLE = True
+LANGGRAPH_IMPORT_ERROR = None
+try:
+    from langgraph.graph import StateGraph, END
+except Exception as import_error:
+    LANGGRAPH_AVAILABLE = False
+    LANGGRAPH_IMPORT_ERROR = import_error
+    StateGraph = None
+    END = None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+if not LANGGRAPH_AVAILABLE:
+    logger.warning(
+        "LangGraph unavailable, falling back to sequential pipeline: %s",
+        LANGGRAPH_IMPORT_ERROR,
+    )
 
 # Load RAG content (Guidelines)
 with open('sepsis_guidelines.txt', 'r') as f:
     guidelines_text = f.read()
 
 # Initialize LLM
-llm = Ollama(model="gemma")
+LLM_AVAILABLE = True
+LLM_INIT_ERROR = None
+try:
+    llm = Ollama(model="gemma")
+except Exception as init_error:
+    llm = None
+    LLM_AVAILABLE = False
+    LLM_INIT_ERROR = init_error
+    logger.warning("Ollama unavailable, falling back to default orders: %s", init_error)
+
+DEFAULT_ORDERS = [
+    "Order Lactate Redraw",
+    "Administer 30mL/kg Crystalloid",
+    "Order Blood Cultures",
+    "Administer Broad-Spectrum Antibiotics",
+]
 
 # State Management
 class AgentState(TypedDict):
@@ -77,7 +107,14 @@ def planner_node(state: AgentState):
     Output ONLY a JSON list of strings representing the orders (e.g., ["Order Lactate Redraw", "Administer 30mL/kg Crystalloid"]). Do not include any other text.
     """
 
-    response = llm.invoke(prompt)
+    if not LLM_AVAILABLE or llm is None:
+        return {"plan": DEFAULT_ORDERS}
+
+    try:
+        response = llm.invoke(prompt)
+    except Exception as e:
+        logger.error("LLM invocation failed, using fallback orders: %s", e)
+        return {"plan": DEFAULT_ORDERS}
 
     # Parse LLM response (robustness check needed in prod)
     try:
@@ -88,10 +125,10 @@ def planner_node(state: AgentState):
             plan_json = response[start:end]
             plan = json.loads(plan_json)
         else:
-            plan = ["Consult Specialist (Parse Error)"]
+            plan = DEFAULT_ORDERS
     except Exception as e:
-        logger.error(f"Failed to parse plan: {e}")
-        plan = ["Consult Specialist (JSON Error)"]
+        logger.error("Failed to parse plan, using fallback orders: %s", e)
+        plan = DEFAULT_ORDERS
 
     return {"plan": plan}
 
@@ -121,6 +158,8 @@ def verifier_node(state: AgentState):
 
 # Build the Graph
 def create_agent_graph():
+    if not LANGGRAPH_AVAILABLE:
+        return None
     workflow = StateGraph(AgentState)
 
     # Add Nodes
@@ -153,6 +192,20 @@ def create_agent_graph():
     workflow.add_edge("verifier", END)
 
     return workflow.compile()
+
+def run_sequential_pipeline(state: AgentState) -> AgentState:
+    updated_state = {**state, **perceptor_node(state)}
+    if updated_state["alert_triggered"]:
+        updated_state.update(planner_node(updated_state))
+        updated_state.update(executor_node(updated_state))
+        updated_state.update(verifier_node(updated_state))
+    else:
+        updated_state.update({
+            "plan": [],
+            "execution_result": ["No actions required."],
+            "explanation": "No sepsis alert triggered.",
+        })
+    return updated_state
 
 # Orchestrator Function
 def run_orchestrator(patient_file='output/harmonized_data.json'):
@@ -190,8 +243,11 @@ def run_orchestrator(patient_file='output/harmonized_data.json'):
                 "explanation": ""
             }
 
-            # Run the graph
-            result = app.invoke(initial_state)
+            # Run the graph or fallback sequential pipeline
+            if app is None:
+                result = run_sequential_pipeline(initial_state)
+            else:
+                result = app.invoke(initial_state)
             all_results.append(result)
 
             # Output for this patient

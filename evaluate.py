@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_auc_score, average_precision_score, precision_recall_curve
+from sklearn.metrics import roc_auc_score, average_precision_score
 import random
 import time
 

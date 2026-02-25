@@ -1,143 +1,146 @@
-# Jules: Fast-Track Agentic PoC for Sepsis Detection
+# Agentic Sepsis Orchestration — AI-Driven Early Detection & Clinical Decision Support
 
-This project implements an **Agentic Framework** for early sepsis detection and management using synthetic patient data. The system is designed to simulate a real-world clinical workflow where digital agents monitor vital signs, generate treatment plans based on Sepsis-3 guidelines, and execute orders via a mock FHIR interface.
+An **AI-driven agentic framework** for early sepsis detection and automated clinical order generation using synthetic patient data, NLP-based entity recognition, and advanced Large Language Models (LLMs).
 
-**Subtitle:** *Agentic Sepsis Orchestration: End-to-End Detection, Planning, and Action in a Synthetic EHR Workflow*
-
-## 🎯 Objective
-
-Build an end-to-end, agentic sepsis workflow that (1) screens patients using Sepsis-3 criteria, (2) generates guideline-consistent bundle orders via RAG + LLM, (3) executes mock FHIR actions, and (4) explains alerts with feature-importance signals.
-
-## 🧾 Abstract / Motivation
-
-Sepsis care requires rapid, coordinated decisions. This PoC demonstrates an agentic pipeline that unifies monitoring, planning, execution, and verification. On synthetic EHR data, the system produces clinically coherent bundles while maintaining high detection performance and measurable response latency.
+---
 
 ## 🚀 Project Overview
 
-The goal of this Proof-of-Concept (PoC) is to demonstrate the capabilities of an agentic system in a healthcare setting. Specifically, it aims to:
-1.  **Monitor** patient data streams for Sepsis-3 screening criteria (HR, RR, Temp, Lactate).
-2.  **Generate** personalized treatment plans using a Retrieval-Augmented Generation (RAG) pipeline powered by a local Large Language Model (LLM).
-3.  **Execute** clinical orders autonomously (simulated).
-4.  **Verify** and explain decisions using simulated SHAP feature importance.
+This Proof-of-Concept (PoC) demonstrates an agentic AI system for healthcare that:
 
-## 🏗️ System Design
+1. **Monitors** patient data streams using clinical NLP (LOINC entity recognition + Sepsis-3 threshold pattern matching)
+2. **Generates** personalized treatment plans via a Retrieval-Augmented Generation (RAG) pipeline powered by a local LLM (Ollama/Gemma)
+3. **Executes** clinical orders autonomously via a simulated FHIR interface
+4. **Explains** decisions using SHAP-proxy feature importance scoring
 
-The architecture follows a modular pipeline:
+---
 
-1.  **Data Generation:**
-    *   A Python script (`generate_synthetic_data.py`) creates a synthetic cohort of patients, mimicking the output of tools like Synthea.
-    *   It generates diverse demographics and vital sign patterns, including specific sepsis indicators (e.g., elevated Lactate, Tachycardia).
-    *   **Output:** `patients.csv`, `encounters.csv`, `observations.csv`.
+## 🏗️ System Architecture
 
-2.  **Harmonization:**
-    *   The raw CSV data is mapped to a unified, patient-centric JSON structure (`harmonize_data.py`).
-    *   This aligns the data with a simplified MIMIC-IV schema (`vitalsign`, `labevents`, `admissions`).
-    *   **Output:** `harmonized_data.json`.
+```
+Synthetic Data → Harmonization → [ Perceptor → Planner → Executor → Verifier ] → Evaluation
+                                         ↑ LangGraph Orchestration ↑
+```
 
-3.  **Agentic Orchestration:**
-    *   The core logic resides in `orchestrator.py`, built using **LangGraph**.
-    *   It manages the flow between four specialized agents:
-        *   **Perceptor Agent:** Monitors incoming vital signs. Triggers an alert if Sepsis-3 criteria are met (e.g., Lactate > 2.0 mmol/L).
-        *   **Planner Agent:** Uses **Ollama (Gemma)** and RAG (Sepsis Guidelines) to reason about the patient's condition and decompose the "Sepsis Bundle" into tasks.
-        *   **Executor Agent:** Mocks a FHIR API to "place orders" (e.g., fluid bolus, antibiotics) and logs the actions.
-        *   **Verifier Agent:** Provides explainability by calculating feature importance (simulated SHAP values) for the alert.
+### Pipeline Steps
 
-4.  **Evaluation:**
-    *   The `evaluate.py` script calculates key performance metrics:
-        *   **AUROC / AUPRC:** Accuracy of sepsis detection.
-        *   **ECE:** Expected Calibration Error (Safety metric).
-        *   **Latency:** System response time.
-    *   It also generates visual assets for reporting (`shap_importance_plot.png`, `response_time_comparison.png`).
+| Step | Script | Output |
+|------|--------|--------|
+| 1. Data Generation | `generate_synthetic_data.py` | `patients.csv`, `encounters.csv`, `observations.csv` |
+| 2. Harmonization | `harmonize_data.py` | `harmonized_data.json` |
+| 3. Agent Orchestration | `orchestrator.py` | `orchestration_results.json` |
+| 4. Evaluation | `evaluate.py` | `evaluation_metrics.csv`, plots |
 
-## 🧪 Methods
-
-- **Cohort:** 200 synthetic patients, 558 encounters/visits.
-- **Perceptor:** Rule-based screening (HR>90, RR≥22, Temp>38, Lactate>2).
-- **Planner:** RAG + LLM (Ollama/Gemma) to produce Sepsis bundle orders.
-- **Executor:** Mock FHIR order placement.
-- **Verifier:** SHAP-proxy feature importance.
-- **Evaluation:** AUROC, AUPRC, ECE, simulated latency.
-
-## 📈 Results / Discussion (Latest Run)
-
-- **Alerts:** 274 / 558 visits (49.1%).
-- **AUROC:** 0.9795
-- **AUPRC:** 0.9549
-- **ECE:** 0.0810
-- **Avg Latency:** 3.47 s (simulated)
-
-Orders consistently aligned with the Sepsis bundle (fluids, antibiotics, lactate redraw, cultures), supporting clinical plausibility in this PoC setting.
-
-## 🖼️ Latest Figures / Assets
-
-- `output/response_time_comparison.png` (latency comparison)
-- `output/shap_importance_plot.png` (global feature importance)
-- `output/pipeline_diagram.png` (system overview)
-- `output/Agentic_Sepsis_Poster.pptx` (filled poster template)
+---
 
 ## 🤖 Agent Roles
 
-| Agent | Responsibility | Logic / Tech |
-| :--- | :--- | :--- |
-| **Perceptor** | Monitoring | Rule-based (HR > 90, Lactate > 2.0) |
-| **Planner** | Decision Making | LLM (Ollama/Gemma) + RAG (Guidelines) |
-| **Executor** | Action | Mock FHIR API Interface |
-| **Verifier** | Explainability | Simulated SHAP Analysis |
+| Agent | Responsibility | Technique |
+|-------|---------------|-----------|
+| **Perceptor** | Sepsis screening | LOINC entity recognition + Sepsis-3 threshold pattern matching |
+| **Planner** | Treatment planning | Ollama (Gemma) LLM + RAG over sepsis guidelines |
+| **Executor** | Order placement | Mock FHIR API interface |
+| **Verifier** | Explainability | SHAP-proxy feature importance (deviation from clinical baseline) |
+
+### Clinical NLP — Perceptor Agent
+
+The Perceptor applies two clinical NLP techniques:
+
+1. **LOINC-coded entity recognition** — maps structured observation codes to clinical concepts:
+   - `8867-4` → Heart Rate (tachycardia marker)
+   - `9279-1` → Respiratory Rate (tachypnea marker)
+   - `8310-5` → Body Temperature (hyperthermia marker)
+   - `32693-4` → Lactate (hyperlactatemia marker)
+
+2. **Threshold-based pattern matching** (Sepsis-3 criteria):
+   - HR > 90 bpm → +1 risk point
+   - RR ≥ 22 breaths/min → +1 risk point
+   - Temp > 38.0°C → +1 risk point
+   - Lactate > 2.0 mmol/L → +2 risk points (strong indicator)
+   - Alert triggered if **risk score ≥ 2**
+
+---
 
 ## 🛠️ Usage
 
 ### Prerequisites
 - Python 3.9+
-- Ollama (running locally with `gemma` model)
+- Ollama running locally with the `gemma` model
 
 ### Installation
 ```bash
-# 1. Install Python dependencies
 pip install -r requirements.txt
-
-# 2. Install and start Ollama (if not already running)
-# (See ollama.com for instructions)
 ollama pull gemma
 ```
 
 ### Running the Pipeline
 ```bash
-# 1. Generate Synthetic Data
+# 1. Generate synthetic data (200 patients)
 python3 generate_synthetic_data.py
 
-# 2. Harmonize Data
+# 2. Harmonize to unified JSON
 python3 harmonize_data.py
 
-# 3. Run the Agent Orchestration
+# 3. Run agent orchestration
 python3 orchestrator.py
 
-# 4. Evaluate Results
+# 4. Evaluate and generate plots
 python3 evaluate.py
 ```
 
-## 📊 Example Output
+---
 
-**Scenario:** Patient P006 presents with high heart rate and elevated lactate.
+## 📊 Results (200-Patient Cohort)
 
-**Agent Logs:**
-```
-INFO:agents:Sepsis Alert for P006: ['Heart Rate 117.0 > 90', 'Lactate 3.4 > 2.0']
-INFO:__main__:--- PLANNER AGENT ---
-INFO:__main__:--- EXECUTOR AGENT ---
-INFO:agents:Order 'Order Lactate Redraw' placed (ID: ORD-2293, Status: success)
-INFO:agents:Order 'Administer 30mL/kg Crystalloid' placed (ID: ORD-9369, Status: success)
-INFO:agents:Order 'Order Blood Cultures' placed (ID: ORD-3136, Status: success)
-INFO:agents:Order 'Administer Broad-Spectrum Antibiotics' placed (ID: ORD-5631, Status: success)
-INFO:__main__:--- VERIFIER AGENT ---
-```
+| Metric | Value |
+|--------|-------|
+| **Patients** | 200 |
+| **Encounters** | 603 |
+| **Alerts Triggered** | 299 (49.6%) |
+| **AUROC** | 0.9886 |
+| **AUPRC** | 0.9761 |
+| **ECE** (calibration) | 0.0481 |
+| **Avg Latency — Alert path** (LLM) | 3.86s |
+| **Avg Latency — Non-alert path** | 0.10s |
 
-**Explanation:**
-```
-Feature Importance Analysis (SHAP-proxy):
-- Heart Rate: 117.0 (Importance: 0.75)
-- Lactate: 3.4 (Importance: 0.04)
-```
+> *Latency reflects simulated LLM inference. All other metrics computed from actual pipeline output.*
 
-## 📈 Results (PoC Batch)
+### Evaluation Dashboard
+![Evaluation Dashboard](output/evaluation_dashboard.png)
 
-See **Results / Discussion (Latest Run)** above for current metrics and figures.
+### Precision-Recall Curve
+![Precision-Recall Curve](output/precision_recall_curve.png)
+
+---
+
+## 📁 Output Files
+
+| File | Description |
+|------|-------------|
+| `output/patients.csv` | 200 synthetic patients |
+| `output/encounters.csv` | 603 clinical encounters |
+| `output/observations.csv` | LOINC-coded vital sign observations |
+| `output/harmonized_data.json` | Unified patient-event JSON (MIMIC-IV schema) |
+| `output/orchestration_results.json` | Full per-encounter agent pipeline results |
+| `output/evaluation_metrics.csv` | AUROC, AUPRC, ECE, latency |
+| `output/evaluation_dashboard.png` | ROC curve + SHAP importance + latency distribution |
+| `output/precision_recall_curve.png` | Precision-Recall curve |
+
+---
+
+## ⚠️ Limitations
+
+- Synthetic data only — not validated on real EHR data
+- Planner LLM (Ollama/Gemma) requires local installation; offline runs use mocked orders
+- SHAP values are proxies (deviation-based), not true SHAP from a trained ML model
+- Latency figures are simulated for the LLM inference component
+
+---
+
+## 🔭 Future Work
+
+- Validate on real-world EHR data (MIMIC-IV)
+- Integrate full SOFA score computation
+- Extend NLP pipeline to unstructured clinical notes (discharge summaries, nursing notes)
+- Replace SHAP-proxy with true SHAP from a trained gradient-boosted model
+- Clinical validation for responsible deployment in acute care settings

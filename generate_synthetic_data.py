@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
 import random
+import os
 from datetime import datetime, timedelta
 
-def generate_synthetic_data(num_patients=10, output_dir='output'):
-    """Generates synthetic patient data mimicking Synthea output."""
+random.seed(42)
+np.random.seed(42)
 
-    # 1. Patients Table
+def generate_synthetic_data(num_patients=200, output_dir='output'):
     patients = []
     for i in range(num_patients):
         patient_id = f"P{i:03d}"
@@ -16,32 +17,13 @@ def generate_synthetic_data(num_patients=10, output_dir='output'):
             'Id': patient_id,
             'BIRTHDATE': birthdate.strftime('%Y-%m-%d'),
             'DEATHDATE': None,
-            'SSN': f"999-{random.randint(10,99)}-{random.randint(1000,9999)}",
-            'DRIVERS': f"S{random.randint(10000000,99999999)}",
-            'PASSPORT': f"N{random.randint(10000000,99999999)}",
-            'PREFIX': 'Mr.' if gender == 'M' else 'Ms.',
-            'FIRST': f"First{i}",
-            'LAST': f"Last{i}",
-            'SUFFIX': None,
-            'MAIDEN': None,
-            'MARITAL': random.choice(['M', 'S']),
+            'GENDER': gender,
             'RACE': random.choice(['white', 'black', 'asian', 'hispanic']),
             'ETHNICITY': random.choice(['nonhispanic', 'hispanic']),
-            'GENDER': gender,
-            'BIRTHPLACE': 'Boston',
-            'ADDRESS': '123 Main St',
-            'CITY': 'Boston',
-            'STATE': 'MA',
-            'COUNTY': 'Suffolk',
-            'ZIP': '02115',
-            'LAT': 42.3601,
-            'LON': -71.0589,
-            'HEALTHCARE_EXPENSES': random.uniform(1000, 50000),
-            'HEALTHCARE_COVERAGE': random.uniform(500, 10000)
+            'CITY': 'Boston', 'STATE': 'MA',
         })
     df_patients = pd.DataFrame(patients)
 
-    # 2. Encounters Table
     encounters = []
     for p in patients:
         num_encounters = random.randint(1, 5)
@@ -54,90 +36,38 @@ def generate_synthetic_data(num_patients=10, output_dir='output'):
                 'START': start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'STOP': stop_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'PATIENT': p['Id'],
-                'ORGANIZATION': 'General Hospital',
-                'PROVIDER': 'Dr. Smith',
-                'PAYER': 'Blue Cross',
                 'ENCOUNTERCLASS': 'inpatient',
-                'CODE': '185345009',
-                'DESCRIPTION': 'Encounter for symptom',
-                'BASE_ENCOUNTER_COST': random.uniform(100, 5000),
-                'TOTAL_CLAIM_COST': random.uniform(100, 5000),
-                'PAYER_COVERAGE': random.uniform(50, 4000),
-                'REASONCODE': None,
-                'REASONDESCRIPTION': None
             })
     df_encounters = pd.DataFrame(encounters)
 
-    # 3. Observations Table (Vitals & Labs)
     observations = []
     for enc in encounters:
-        # Generate sepsis-indicative values for some patients
         is_septic = random.choice([True, False])
-
-        # Heart Rate
-        hr_val = random.randint(95, 120) if is_septic else random.randint(60, 90)
-        observations.append({
-            'DATE': enc['START'],
-            'PATIENT': enc['PATIENT'],
-            'ENCOUNTER': enc['Id'],
-            'CODE': '8867-4',
-            'DESCRIPTION': 'Heart rate',
-            'VALUE': hr_val,
-            'UNITS': 'beats/min',
-            'TYPE': 'numeric'
-        })
-
-        # Respiratory Rate
-        rr_val = random.randint(22, 30) if is_septic else random.randint(12, 20)
-        observations.append({
-            'DATE': enc['START'],
-            'PATIENT': enc['PATIENT'],
-            'ENCOUNTER': enc['Id'],
-            'CODE': '9279-1',
-            'DESCRIPTION': 'Respiratory rate',
-            'VALUE': rr_val,
-            'UNITS': 'breaths/min',
-            'TYPE': 'numeric'
-        })
-
-        # Temperature
-        temp_val = random.uniform(38.0, 40.0) if is_septic else random.uniform(36.5, 37.5)
-        observations.append({
-            'DATE': enc['START'],
-            'PATIENT': enc['PATIENT'],
-            'ENCOUNTER': enc['Id'],
-            'CODE': '8310-5',
-            'DESCRIPTION': 'Body temperature',
-            'VALUE': round(temp_val, 1),
-            'UNITS': 'Cel',
-            'TYPE': 'numeric'
-        })
-
-        # Lactate (Lab)
-        if random.random() > 0.5: # Not all encounters have labs immediately
-            lactate_val = random.uniform(2.5, 5.0) if is_septic else random.uniform(0.5, 1.5)
-            observations.append({
-                'DATE': enc['START'],
-                'PATIENT': enc['PATIENT'],
-                'ENCOUNTER': enc['Id'],
-                'CODE': '32693-4',
-                'DESCRIPTION': 'Lactate [Moles/volume] in Blood',
-                'VALUE': round(lactate_val, 1),
-                'UNITS': 'mmol/L',
-                'TYPE': 'numeric'
-            })
-
+        hr_val = random.randint(95, 130) if is_septic else random.randint(55, 90)
+        observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'], 'CODE': '8867-4',
+            'DESCRIPTION': 'Heart rate', 'VALUE': hr_val, 'UNITS': 'beats/min', 'TYPE': 'numeric'})
+        rr_val = random.randint(22, 32) if is_septic else random.randint(10, 20)
+        observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'], 'CODE': '9279-1',
+            'DESCRIPTION': 'Respiratory rate', 'VALUE': rr_val, 'UNITS': 'breaths/min', 'TYPE': 'numeric'})
+        temp_val = random.uniform(38.1, 40.5) if is_septic else random.uniform(36.2, 37.5)
+        observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'], 'CODE': '8310-5',
+            'DESCRIPTION': 'Body temperature', 'VALUE': round(temp_val, 1), 'UNITS': 'Cel', 'TYPE': 'numeric'})
+        if random.random() > 0.3:
+            lactate_val = random.uniform(2.5, 6.0) if is_septic else random.uniform(0.4, 1.8)
+            observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+                'ENCOUNTER': enc['Id'], 'CODE': '32693-4',
+                'DESCRIPTION': 'Lactate', 'VALUE': round(lactate_val, 1), 'UNITS': 'mmol/L', 'TYPE': 'numeric'})
     df_observations = pd.DataFrame(observations)
 
-    # Save to CSV
-    import os
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
+    os.makedirs(output_dir, exist_ok=True)
     df_patients.to_csv(f'{output_dir}/patients.csv', index=False)
     df_encounters.to_csv(f'{output_dir}/encounters.csv', index=False)
     df_observations.to_csv(f'{output_dir}/observations.csv', index=False)
-    print(f"Generated {num_patients} patients, {len(encounters)} encounters, and {len(observations)} observations in {output_dir}/")
+    print(f"Generated {num_patients} patients, {len(encounters)} encounters, {len(observations)} observations → {output_dir}/")
+    return len(encounters)
 
 if __name__ == "__main__":
-    generate_synthetic_data()
+    generate_synthetic_data(200)

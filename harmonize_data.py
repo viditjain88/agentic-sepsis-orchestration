@@ -10,6 +10,7 @@ def harmonize_data(input_dir='output', output_file='output/harmonized_data.json'
         patients = pd.read_csv(f'{input_dir}/patients.csv')
         encounters = pd.read_csv(f'{input_dir}/encounters.csv')
         observations = pd.read_csv(f'{input_dir}/observations.csv')
+        notes = pd.read_csv(f'{input_dir}/notes.csv')
     except FileNotFoundError as e:
         print(f"Error loading files: {e}")
         return
@@ -53,6 +54,16 @@ def harmonize_data(input_dir='output', output_file='output/harmonized_data.json'
                     'valueuom': obs['UNITS']
                 }
                 visit_data['events'].append(event)
+
+            # Get clinical note for this encounter
+            enc_notes = notes[notes['ENCOUNTER'] == enc_id]
+            visit_notes = []
+            for _, note in enc_notes.iterrows():
+                visit_notes.append({
+                    'charttime': note['DATE'],
+                    'text': note['TEXT']
+                })
+            visit_data['clinical_notes'] = visit_notes
 
             p_data['visits'].append(visit_data)
 

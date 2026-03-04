@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_auc_score, average_precision_score
+from sklearn.metrics import roc_auc_score, average_precision_score, precision_recall_curve
 import random
 import time
 
@@ -32,17 +32,10 @@ def evaluate_performance(results_file='output/orchestration_results.json'):
         is_septic_truth = (data['HR'] > 95) and (data['Temp'] > 38.0 or data['Lactate'] > 2.5)
         y_true.append(1 if is_septic_truth else 0)
 
-        # Predicted Score: The 'Perceptor' agent outputs a binary 'alert_triggered'.
-        # For AUROC, we need a continuous score. We can use the 'risk_score' logic from the agent.
-        # HR>90 (+1), RR>=22 (+1), Temp>38 (+1), Lactate>2 (+2)
-        score = 0
-        if data['HR'] > 90: score += 1
-        if data['RR'] >= 22: score += 1
-        if data['Temp'] > 38.0: score += 1
-        if data['Lactate'] > 2.0: score += 2
-
-        # Normalize score (max is 5)
-        y_scores.append(score / 5.0)
+        # Predicted Score: The NLP Perceptor now outputs a continuous 'nlp_sepsis_score'.
+        # This replaces the old rule-based risk score.
+        score = res.get('nlp_sepsis_score', 0.0)
+        y_scores.append(score)
 
         # Latency: Simulate processing time since we didn't log exact timestamps in the orchestrator
         # Real latency would be measured during execution.

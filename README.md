@@ -27,8 +27,8 @@ The architecture follows a modular pipeline:
 3.  **Agentic Orchestration:**
     *   The core logic resides in `orchestrator.py`, built using **LangGraph**.
     *   It manages the flow between four specialized agents:
-        *   **Perceptor Agent:** Monitors incoming vital signs. Triggers an alert if Sepsis-3 criteria are met (e.g., Lactate > 2.0 mmol/L).
-        *   **Planner Agent:** Uses **Ollama (Gemma)** and RAG (Sepsis Guidelines) to reason about the patient's condition and decompose the "Sepsis Bundle" into tasks.
+        *   **NLP Perceptor Agent:** Uses a Transformer-based sequence classification model (**Bio_ClinicalBERT**) to analyze unstructured clinical notes. It predicts the probability of sepsis presence based on the text.
+        *   **Planner Agent:** Uses **Ollama (Gemma)** and RAG (Sepsis Guidelines) to reason about the patient's condition and decompose the "Sepsis Bundle" into tasks, triggered when the NLP model detects high risk.
         *   **Executor Agent:** Mocks a FHIR API to "place orders" (e.g., fluid bolus, antibiotics) and logs the actions.
         *   **Verifier Agent:** Provides explainability by calculating feature importance (simulated SHAP values) for the alert.
 
@@ -43,7 +43,7 @@ The architecture follows a modular pipeline:
 
 | Agent | Responsibility | Logic / Tech |
 | :--- | :--- | :--- |
-| **Perceptor** | Monitoring | Rule-based (HR > 90, Lactate > 2.0) |
+| **NLP Perceptor** | Analyzing unstructured data | `emilyalsentzer/Bio_ClinicalBERT` Sequence Classification |
 | **Planner** | Decision Making | LLM (Ollama/Gemma) + RAG (Guidelines) |
 | **Executor** | Action | Mock FHIR API Interface |
 | **Verifier** | Explainability | Simulated SHAP Analysis |
@@ -85,7 +85,8 @@ python3 evaluate.py
 
 **Agent Logs:**
 ```
-INFO:agents:Sepsis Alert for P006: ['Heart Rate 117.0 > 90', 'Lactate 3.4 > 2.0']
+INFO:__main__:--- NLP PERCEPTOR AGENT (Bio_ClinicalBERT) ---
+INFO:__main__:NLP Alert triggered with score 0.84 for P000
 INFO:__main__:--- PLANNER AGENT ---
 INFO:__main__:--- EXECUTOR AGENT ---
 INFO:agents:Order 'Order Lactate Redraw' placed (ID: ORD-2293, Status: success)

@@ -17,36 +17,40 @@ This Proof-of-Concept (PoC) demonstrates an agentic AI system for healthcare tha
 
 ## 📝 Recent Changes (Code Audit)
 
-- Added **clinical-note + cellular-data augmentation** in `generate_synthetic_data.py`:
-   - Optional HuggingFace synthetic-note ingestion with fallback note generation
-   - New per-encounter `CLINICAL_NOTE` and `CELLULAR_DATA` fields
-   - Cellular network graph schema now exported as `{"nodes": [...], "links": [...]}`
+### 1) Data Augmentation (`generate_synthetic_data.py`)
+- Optional HuggingFace synthetic-note ingestion with fallback note generation
+- New per-encounter `CLINICAL_NOTE` and `CELLULAR_DATA` fields
+- Cellular network graph schema exported as `{"nodes": [...], "links": [...]}`
 
-- Upgraded **harmonization pipeline** in `harmonize_data.py`:
-   - Added safe CSV loading (`load_csv`) and missing-file guardrails
-   - Preserved `clinical_note` and parsed `cellular_data` into `harmonized_data.json`
-   - Standardized patient demographics casting and dynamic age derivation
+### 2) Harmonization Upgrades (`harmonize_data.py`)
+- Added safe CSV loading (`load_csv`) and missing-file guardrails
+- Preserved `clinical_note` and parsed `cellular_data` into `harmonized_data.json`
+- Standardized patient demographics casting and dynamic age derivation
 
-- Expanded **agent framework** in `agents.py` and API integration in `backend/api.py`:
-   - `PerceptorAgent` now includes MedCAT-based clinical entity extraction from notes
-   - Added `TherapeuticsAgent` for cellular heat-signature-informed adjunct therapies
-   - Added `EvaluatorAgent` (LLM-as-judge style heuristic scoring)
-   - `/api/monitor` now returns `clinical_note`, `extracted_entities`, `cellular_data`, and `evaluation`
+### 3) Clinical NLP (Perceptor): Three Techniques (`agents.py`)
+1. **LOINC-coded entity recognition** from structured vitals/labs
+2. **Threshold-based Sepsis-3 pattern matching** for risk scoring
+3. **MedCAT entity extraction** from unstructured clinical notes
 
-- Updated **planner behavior** in `orchestrator.py`:
-   - `PlannerAgent.plan()` now accepts optional `cellular_data`
-   - Base sepsis bundle can be extended with therapeutic recommendations
-   - Batch orchestration now passes visit-level `cellular_data` so therapeutic extensions appear in `orchestration_results.json`
+### 4) Agent + API Expansion (`agents.py`, `backend/api.py`)
+- Added `TherapeuticsAgent` for cellular heat-signature-informed adjunct therapies
+- Added `EvaluatorAgent` (LLM-as-a-Judge style heuristic scoring)
+- `/api/monitor` now returns `clinical_note`, `extracted_entities`, `cellular_data`, and `evaluation`
 
-- Refreshed **frontend experience** in `frontend/src/App.jsx`:
-   - Added richer clinical output panels (notes/entities, cellular graph, evaluator score)
-   - Added network visualization using `react-force-graph-2d`
-   - Added evaluator step in the visible pipeline timeline
-   - Patient form vitals now prefill dynamically from the selected patient’s latest visit (instead of static defaults)
+### 5) Planner Updates (`orchestrator.py`)
+- `PlannerAgent.plan()` accepts optional `cellular_data`
+- Base sepsis bundle can be extended with therapeutic recommendations
+- Batch orchestration passes visit-level `cellular_data` so therapeutic extensions appear in `orchestration_results.json`
 
-- Added **MedCAT bootstrap utility** in `medcat_processor.py`:
-   - Attempts model-pack download/load automatically
-   - Falls back to deterministic keyword matching when model initialization is unavailable
+### 6) Frontend Updates (`frontend/src/App.jsx`)
+- Added richer clinical output panels (notes/entities, cellular graph, evaluator score)
+- Added network visualization using `react-force-graph-2d`
+- Added evaluator step in the visible pipeline timeline
+- Patient form vitals now prefill dynamically from the selected patient’s latest visit (instead of static defaults)
+
+### 7) MedCAT Bootstrap Utility (`medcat_processor.py`)
+- Attempts model-pack download/load automatically
+- Falls back to deterministic keyword matching when model initialization is unavailable
 
 ---
 

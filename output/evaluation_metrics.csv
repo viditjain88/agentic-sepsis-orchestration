@@ -1,2 +1,2 @@
 Patients,Encounters,Alerts,Alert_Rate_pct,AUROC,AUPRC,ECE,Avg_Latency_All_s,Avg_Latency_Alert_s
-200,603,299,49.6,0.9886,0.9761,0.0481,1.9642,3.8596
+200,629,304,48.3,0.9894,0.9769,0.0528,1.9216,3.87

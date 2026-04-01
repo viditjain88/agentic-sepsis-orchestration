@@ -40,6 +40,8 @@ class PerceptorAgent:
         return alerts
 
 
+from agents import TherapeuticsAgent
+
 class PlannerAgent:
     """RAG + LLM (Ollama/Gemma) — LLM mocked for offline execution; logic identical."""
     SEPSIS_BUNDLE = [
@@ -48,10 +50,21 @@ class PlannerAgent:
         "Order Blood Cultures",
         "Administer Broad-Spectrum Antibiotics"
     ]
-    def plan(self, clinical_data):
+    
+    def __init__(self):
+        self.therapeutics_agent = TherapeuticsAgent()
+        
+    def plan(self, clinical_data, cellular_data=None):
         # In production: Ollama(model="gemma") + RAG over sepsis_guidelines.txt
         # Mocked here (no network) — returns the same bundle the LLM consistently produces
-        return self.SEPSIS_BUNDLE
+        base_plan = list(self.SEPSIS_BUNDLE)
+        
+        if cellular_data:
+            # Generate advanced therapies from TherapeuticsAgent
+            advanced_therapies = self.therapeutics_agent.predict_therapies(cellular_data)
+            base_plan.extend(advanced_therapies)
+            
+        return base_plan
 
 
 class ExecutorAgent:
@@ -121,7 +134,7 @@ def run_orchestrator(patient_file='output/harmonized_data.json',
             if alert_triggered:
                 alert_count += 1
                 # Planner
-                plan = planner.plan(clinical_data)
+                plan = planner.plan(clinical_data, cellular_data=visit.get('cellular_data'))
                 # Executor
                 execution_result = executor.execute_orders(plan, visit['hadm_id'])
                 # Verifier

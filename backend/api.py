@@ -8,7 +8,7 @@ import sys
 # Add parent dir to path to import agents
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from agents import PerceptorAgent, ExecutorAgent, VerifierAgent
+from agents import PerceptorAgent, ExecutorAgent, VerifierAgent, EvaluatorAgent
 from orchestrator import PlannerAgent
 
 app = FastAPI(title="Sepsis Orchestration API")
@@ -81,6 +81,22 @@ def run_agents(vitals: VitalsInput):
         }]
     }
 
+    # Fetch clinical note and cellular data from harmonized_data to pass to the pipeline
+    data = load_data()
+    clinical_note = ""
+    cellular_data = None
+    for p in data:
+        if p.get("subject_id") == vitals.subject_id:
+            for v in p.get("visits", []):
+                if v.get("hadm_id") == vitals.visit_id:
+                    clinical_note = v.get("clinical_note", "")
+                    cellular_data = v.get("cellular_data")
+                    break
+            break
+
+    patient_data['visits'][0]['clinical_note'] = clinical_note
+    patient_data['visits'][0]['cellular_data'] = cellular_data
+
     alerts = perceptor.monitor(patient_data)
     alert_triggered = len(alerts) > 0
 
@@ -88,6 +104,7 @@ def run_agents(vitals: VitalsInput):
     execution_result = []
     explanation = ""
     shap_importance = {}
+    evaluation = {}
 
     clinical_data = {
         'HR': vitals.hr,
@@ -97,10 +114,13 @@ def run_agents(vitals: VitalsInput):
     }
 
     if alert_triggered:
-        plan = planner.plan(clinical_data)
+        plan = planner.plan(clinical_data, cellular_data=cellular_data)
         execution_result = executor.execute_orders(plan, vitals.visit_id)
         alert_obj = alerts[0]
         explanation, shap_importance = verifier.explain(alert_obj)
+        
+        evaluator = EvaluatorAgent()
+        evaluation = evaluator.evaluate(alert_obj, plan)
 
     return {
         "alert_triggered": alert_triggered,
@@ -109,5 +129,9 @@ def run_agents(vitals: VitalsInput):
         "execution_result": execution_result,
         "explanation": explanation,
         "shap_importance": shap_importance,
-        "clinical_data": clinical_data
+        "clinical_data": clinical_data,
+        "evaluation": evaluation,
+        "cellular_data": cellular_data,
+        "extracted_entities": alerts[0].get("extracted_entities", []) if alert_triggered else [],
+        "clinical_note": clinical_note
     }

@@ -7,11 +7,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+from medcat_processor import MedCATProcessor
+
 class PerceptorAgent:
     """
-    Clinical NLP — two techniques:
+    Clinical NLP — three techniques:
     1. LOINC-coded entity recognition: maps observation codes to named clinical concepts
     2. Threshold-based pattern matching: screens entities against Sepsis-3 criteria
+    3. MedCAT Entity Extraction: Extracts entities from unstructured clinical notes
     """
 
     # LOINC code → clinical entity mapping
@@ -21,6 +24,9 @@ class PerceptorAgent:
         '8310-5':  'Temperature',      # hyperthermia marker
         '32693-4': 'Lactate',          # hyperlactatemia marker
     }
+
+    def __init__(self):
+        self.medcat = MedCATProcessor()
 
     def monitor(self, patient_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         alerts = []
@@ -58,6 +64,16 @@ class PerceptorAgent:
                 risk_score += 2  # strong indicator — double weight
                 reasons.append(f"Lactate {lactate} > 2.0 mmol/L")
 
+            # ── Step 3: MedCAT Extraction from clinical notes ─────
+            note = visit.get('clinical_note', '')
+            extracted_entities = self.medcat.get_entities(note)
+            
+            # Boost risk score if sepsis/infection entities are found in the notes
+            note_mentions_sepsis = any(e['name'] == 'Sepsis' for e in extracted_entities)
+            if note_mentions_sepsis:
+                risk_score += 1
+                reasons.append(f"Clinical Note mentions Sepsis/Infection markers")
+
             if risk_score >= 2:
                 alert = {
                     'subject_id': subject_id,
@@ -67,7 +83,8 @@ class PerceptorAgent:
                     'timestamp': visit['admittime'],
                     'clinical_data': {
                         'HR': hr, 'RR': rr, 'Temp': temp, 'Lactate': lactate
-                    }
+                    },
+                    'extracted_entities': extracted_entities
                 }
                 alerts.append(alert)
                 logger.info(f"Sepsis Alert for {subject_id} @ {visit['admittime']}: {reasons}")
@@ -115,3 +132,82 @@ class VerifierAgent:
         importance_dict = {self.FEATURES[i]: float(importance[i])
                            for i in range(len(self.FEATURES))}
         return explanation, importance_dict
+
+class EvaluatorAgent:
+    """
+    LLM as a Judge: Evaluates the pipeline outputs (extracted entities, treatment plan, etc.) 
+    against the raw clinical notes and provided inputs.
+    """
+    def evaluate(self, alert: Dict[str, Any], plan: List[str]) -> Dict[str, Any]:
+        # Mocking the LLM Judge evaluation process
+        # In a real scenario, this would send a prompt to an LLM like Gemma or GPT-4
+        # containing the clinical note, extracted entities, and the planner's output.
+        
+        extracted_entities = alert.get('extracted_entities', [])
+        note = alert.get('clinical_note', '')
+        
+        evaluation_score = 0
+        feedback = []
+        
+        # Simple heuristic to mock LLM scoring:
+        # Check if plan contains 'Lactate' if 'Lactate' entity was found, etc.
+        entity_names = [e['name'] for e in extracted_entities]
+        
+        if 'Sepsis' in entity_names and any('Broad-Spectrum Antibiotics' in p for p in plan):
+            evaluation_score += 40
+            feedback.append("Excellent alignment: Antibiotics ordered for suspected Sepsis.")
+        
+        if 'Lactate' in entity_names and any('Lactate Redraw' in p for p in plan):
+            evaluation_score += 20
+            feedback.append("Good alignment: Lactate redraw ordered corresponding to Lactate mention.")
+            
+        if not extracted_entities:
+            evaluation_score += 50 # Baseline if no entities found
+            feedback.append("Neutral: No specific entities extracted from notes to evaluate against.")
+        else:
+            evaluation_score += 40 # Base score for having a standard plan
+            feedback.append("Plan follows standard Sepsis-3 bundle appropriately.")
+            
+        final_score = min(100, evaluation_score)
+        
+        return {
+            "score": final_score,
+            "feedback": " ".join(feedback),
+            "alignment": "High" if final_score >= 80 else "Medium" if final_score >= 50 else "Low"
+        }
+
+class TherapeuticsAgent:
+    """
+    Analyzes cellular data (genes, proteins, signaling pathways) and heat signatures
+    to predict the best combination of therapies to correct cellular dysfunction.
+    """
+    def predict_therapies(self, cellular_data: Dict[str, Any]) -> List[str]:
+        if not cellular_data or 'nodes' not in cellular_data:
+            return ["Standard Sepsis Bundle (No cellular data provided)"]
+            
+        nodes = cellular_data.get('nodes', [])
+        
+        # Analyze heat signatures to identify highly expressed or "hot" targets
+        hot_genes = [n['id'] for n in nodes if n.get('type') == 'gene' and n.get('heat', 0) > 0.6]
+        hot_proteins = [n['id'] for n in nodes if n.get('type') == 'protein' and n.get('heat', 0) > 0.6]
+        hot_pathways = [n['id'] for n in nodes if n.get('type') == 'pathway' and n.get('heat', 0) > 0.6]
+        
+        therapies = []
+        
+        # Map targets to specific therapeutic combinations
+        if 'TNF-alpha' in hot_proteins or 'IL-6' in hot_proteins:
+            therapies.append("Administer targeted anti-cytokine therapy (e.g., Tocilizumab) to reduce inflammation.")
+            
+        if 'Apoptosis' in hot_pathways:
+            therapies.append("Administer apoptosis inhibitors to prevent excessive cell death.")
+            
+        if 'MAPK' in hot_pathways or 'PI3K-AKT' in hot_pathways:
+            therapies.append("Consider kinase inhibitors to stabilize cellular signaling pathways.")
+            
+        if 'VEGFA' in hot_genes or 'VEGF' in hot_proteins:
+            therapies.append("Administer VEGF inhibitors to modulate angiogenesis.")
+            
+        if not therapies:
+            therapies.append("Cellular heat signatures are stable. Continue standard supportive care.")
+            
+        return therapies

@@ -3,11 +3,65 @@ import numpy as np
 import random
 import os
 from datetime import datetime, timedelta
+import urllib.request
+import zipfile
+import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 random.seed(42)
 np.random.seed(42)
 
+def download_clinical_notes_dataset():
+    logger.info("Attempting to load clinical notes dataset from HuggingFace...")
+    try:
+        from datasets import load_dataset
+        ds = load_dataset('starmpcc/Asclepius-Synthetic-Clinical-Notes', split='train')
+        logger.info(f"Loaded {len(ds)} clinical notes.")
+        return ds
+    except Exception as e:
+        logger.warning(f"Failed to load dataset: {e}. Will generate fallback notes.")
+        return None
+
+def generate_cellular_data():
+    genes = ['BRCA1', 'TP53', 'TNF', 'IL6', 'EGFR', 'MYC', 'VEGFA', 'PTEN', 'PIK3CA', 'BRAF']
+    proteins = ['p53', 'TNF-alpha', 'IL-6', 'EGFR', 'c-Myc', 'VEGF', 'PTEN', 'PI3K', 'B-Raf', 'AKT']
+    pathways = ['Apoptosis', 'Inflammation', 'Cell Cycle', 'Angiogenesis', 'MAPK', 'PI3K-AKT']
+
+    n_genes = random.randint(3, 7)
+    selected_genes = random.sample(genes, n_genes)
+    selected_proteins = random.sample(proteins, n_genes)
+    selected_pathways = random.sample(pathways, random.randint(2, 4))
+    
+    nodes = []
+    edges = []
+    
+    for g in selected_genes:
+        expr = random.uniform(-3.0, 3.0)
+        nodes.append({'id': g, 'type': 'gene', 'expression': round(expr, 2), 'heat': abs(expr) / 3.0})
+        
+    for p in selected_proteins:
+        expr = random.uniform(-3.0, 3.0)
+        nodes.append({'id': p, 'type': 'protein', 'expression': round(expr, 2), 'heat': abs(expr) / 3.0})
+        
+    for p in selected_pathways:
+        nodes.append({'id': p, 'type': 'pathway', 'heat': random.uniform(0.1, 1.0)})
+        
+    # Generate random edges between genes, proteins, pathways
+    all_ids = [n['id'] for n in nodes]
+    for _ in range(random.randint(n_genes, n_genes*3)):
+        source = random.choice(all_ids)
+        target = random.choice(all_ids)
+        if source != target:
+            edges.append({'source': source, 'target': target, 'weight': round(random.uniform(-1.0, 1.0), 2)})
+            
+    return {'nodes': nodes, 'links': edges}
+
 def generate_synthetic_data(num_patients=200, output_dir='output'):
+    ds = download_clinical_notes_dataset()
+    
     patients = []
     for i in range(num_patients):
         patient_id = f"P{i:03d}"
@@ -31,12 +85,22 @@ def generate_synthetic_data(num_patients=200, output_dir='output'):
             encounter_id = f"E{p['Id']}_{j:03d}"
             start_time = datetime.now() - timedelta(days=random.randint(1, 365))
             stop_time = start_time + timedelta(hours=random.randint(1, 48))
+            
+            note_text = ""
+            if ds is not None:
+                note_idx = random.randint(0, len(ds)-1)
+                note_text = ds[note_idx]['note']
+            else:
+                note_text = f"Patient {p['Id']} admitted for observation. Vitals monitored."
+                
             encounters.append({
                 'Id': encounter_id,
                 'START': start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'STOP': stop_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'PATIENT': p['Id'],
                 'ENCOUNTERCLASS': 'inpatient',
+                'CLINICAL_NOTE': note_text,
+                'CELLULAR_DATA': json.dumps(generate_cellular_data())
             })
     df_encounters = pd.DataFrame(encounters)
 

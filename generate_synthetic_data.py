@@ -135,10 +135,12 @@ def generate_synthetic_data(num_patients=10, output_dir='output'):
     sepsis_keywords = [
         "Patient presents with severe sepsis.",
         "Lactate is elevated.",
-        "Hypotensive requiring vasopressors.",
+        "Hypotension requiring vasopressors.",
         "Blood cultures positive for gram negative rods.",
         "ICU admission for septic shock.",
-        "Diagnosed with sepsis (ICD-9 995.92)."
+        "Diagnosed with sepsis (ICD-9 995.92).",
+        "Patient exhibits systemic inflammatory response syndrome.",
+        "Lab results indicate lactic acidosis."
     ]
 
     normal_keywords = [

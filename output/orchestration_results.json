@@ -3,193 +3,281 @@
     "subject_id": "P000",
     "visit_id": "EP000_000",
     "clinical_data": {
-      "HR": 112.0,
-      "RR": 22.0,
-      "Temp": 40.0,
-      "Lactate": 0
+      "HR": 64.0,
+      "RR": 12.0,
+      "Temp": 37.0,
+      "Lactate": 0.8
     },
-    "clinical_note": "Routine physical exam normal. Hypotensive requiring vasopressors. No signs of infection. Vital signs are stable. Routine physical exam normal. Lactate is elevated. Recovering well, progressing to regular diet. Patient admitted for elective procedure.",
-    "nlp_sepsis_score": 0.8380964300275142,
-    "alert_triggered": true,
-    "plan": [
-      "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
-    ],
-    "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP000_000 (ID: ORD-8367, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP000_000 (ID: ORD-9214, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP000_000 (ID: ORD-9650, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP000_000 (ID: ORD-9185, Status: success)"
-    ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 112.0 (Importance: 0.81)\n- RR: 22.0 (Importance: 0.12)\n- Temp: 40.0 (Importance: 0.06)\n- Lactate: 0.0 (Importance: 0.02)\n"
+    "clinical_note": "Vital signs are stable. Patient admitted for elective procedure. Recovering well, progressing to regular diet. Vital signs are stable. Recovering well, progressing to regular diet. Vital signs are stable. Patient admitted for elective procedure.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
   },
   {
     "subject_id": "P001",
     "visit_id": "EP001_000",
     "clinical_data": {
-      "HR": 112.0,
-      "RR": 30.0,
-      "Temp": 39.9,
-      "Lactate": 4.1
+      "HR": 73.0,
+      "RR": 19.0,
+      "Temp": 36.9,
+      "Lactate": 0
     },
-    "clinical_note": "Vital signs are stable. Hypotensive requiring vasopressors. Recovering well, progressing to regular diet. Blood cultures positive for gram negative rods. Discharged home in stable condition.",
-    "nlp_sepsis_score": 0.8544636910760408,
+    "clinical_note": "Discharged home in stable condition. Vital signs are stable. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. Vital signs are stable.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P001",
+    "visit_id": "EP001_001",
+    "clinical_data": {
+      "HR": 114.0,
+      "RR": 30.0,
+      "Temp": 38.5,
+      "Lactate": 0
+    },
+    "clinical_note": "Discharged home in stable condition. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. Diagnosed with sepsis (ICD-9 995.92). Patient admitted for elective procedure. Diagnosed with sepsis (ICD-9 995.92).",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
     "alert_triggered": true,
     "plan": [
       "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
+      "Administer 30mL/kg Crystalloid"
     ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
     "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP001_000 (ID: ORD-5179, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP001_000 (ID: ORD-2391, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP001_000 (ID: ORD-6316, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP001_000 (ID: ORD-8390, Status: success)"
+      "Order 'Order Lactate Redraw' placed for visit EP001_001 (ID: ORD-3060, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP001_001 (ID: ORD-7503, Status: success)"
     ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 112.0 (Importance: 0.68)\n- RR: 30.0 (Importance: 0.23)\n- Lactate: 4.1 (Importance: 0.05)\n- Temp: 39.9 (Importance: 0.05)\n"
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 114.0 (Importance: 0.73)\n- RR: 30.0 (Importance: 0.23)\n- Temp: 38.5 (Importance: 0.02)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P001",
+    "visit_id": "EP001_002",
+    "clinical_data": {
+      "HR": 102.0,
+      "RR": 26.0,
+      "Temp": 38.1,
+      "Lactate": 3.6
+    },
+    "clinical_note": "Discharged home in stable condition. Blood cultures positive for gram negative rods. No signs of infection. Patient exhibits systemic inflammatory response syndrome.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
   },
   {
     "subject_id": "P002",
     "visit_id": "EP002_000",
     "clinical_data": {
-      "HR": 72.0,
-      "RR": 12.0,
-      "Temp": 37.5,
-      "Lactate": 1.3
+      "HR": 83.0,
+      "RR": 16.0,
+      "Temp": 36.6,
+      "Lactate": 0.6
     },
-    "clinical_note": "Discharged home in stable condition. Recovering well, progressing to regular diet. Vital signs are stable.",
-    "nlp_sepsis_score": 0.12839389187000094,
+    "clinical_note": "No signs of infection. Vital signs are stable. Vital signs are stable. Patient admitted for elective procedure. No signs of infection. Vital signs are stable. Routine physical exam normal. Routine physical exam normal.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
+  },
+  {
+    "subject_id": "P002",
+    "visit_id": "EP002_001",
+    "clinical_data": {
+      "HR": 103.0,
+      "RR": 28.0,
+      "Temp": 39.1,
+      "Lactate": 2.7
+    },
+    "clinical_note": "Vital signs are stable. Recovering well, progressing to regular diet. Discharged home in stable condition. Patient presents with severe sepsis. Diagnosed with sepsis (ICD-9 995.92). No signs of infection. Vital signs are stable. Routine physical exam normal.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP002_001 (ID: ORD-7725, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP002_001 (ID: ORD-2425, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 103.0 (Importance: 0.68)\n- RR: 28.0 (Importance: 0.25)\n- Temp: 39.1 (Importance: 0.04)\n- Lactate: 2.7 (Importance: 0.03)\n"
   },
   {
     "subject_id": "P003",
     "visit_id": "EP003_000",
     "clinical_data": {
-      "HR": 99.0,
-      "RR": 25.0,
-      "Temp": 38.5,
-      "Lactate": 2.5
+      "HR": 110.0,
+      "RR": 27.0,
+      "Temp": 38.9,
+      "Lactate": 4.1
     },
-    "clinical_note": "Hypotensive requiring vasopressors. Hypotensive requiring vasopressors. Recovering well, progressing to regular diet.",
-    "nlp_sepsis_score": 0.5667091294353215,
-    "alert_triggered": true,
-    "plan": [
-      "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
-    ],
-    "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP003_000 (ID: ORD-5039, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_000 (ID: ORD-9886, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP003_000 (ID: ORD-1343, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP003_000 (ID: ORD-2306, Status: success)"
-    ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 99.0 (Importance: 0.71)\n- RR: 25.0 (Importance: 0.22)\n- Temp: 38.5 (Importance: 0.04)\n- Lactate: 2.5 (Importance: 0.04)\n"
+    "clinical_note": "Discharged home in stable condition. Lab results indicate lactic acidosis. Patient exhibits systemic inflammatory response syndrome.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
   },
   {
     "subject_id": "P003",
     "visit_id": "EP003_001",
     "clinical_data": {
-      "HR": 114.0,
-      "RR": 23.0,
-      "Temp": 38.8,
-      "Lactate": 4.4
+      "HR": 117.0,
+      "RR": 27.0,
+      "Temp": 38.6,
+      "Lactate": 4.0
     },
-    "clinical_note": "Vital signs are stable. Lactate is elevated. ICU admission for septic shock.",
-    "nlp_sepsis_score": 0.5836306646908279,
+    "clinical_note": "Vital signs are stable. Lactate is elevated. Recovering well, progressing to regular diet. Hypotension requiring vasopressors. Discharged home in stable condition. Recovering well, progressing to regular diet.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.9,
     "alert_triggered": true,
     "plan": [
       "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
+      "Administer 30mL/kg Crystalloid"
     ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
     "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP003_001 (ID: ORD-6694, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_001 (ID: ORD-5396, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP003_001 (ID: ORD-8545, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP003_001 (ID: ORD-3164, Status: success)"
+      "Order 'Order Lactate Redraw' placed for visit EP003_001 (ID: ORD-8722, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_001 (ID: ORD-6840, Status: success)"
     ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 114.0 (Importance: 0.78)\n- RR: 23.0 (Importance: 0.12)\n- Lactate: 4.4 (Importance: 0.06)\n- Temp: 38.8 (Importance: 0.03)\n"
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 117.0 (Importance: 0.75)\n- RR: 27.0 (Importance: 0.18)\n- Lactate: 4.0 (Importance: 0.05)\n- Temp: 38.6 (Importance: 0.03)\n"
   },
   {
     "subject_id": "P003",
     "visit_id": "EP003_002",
     "clinical_data": {
-      "HR": 87.0,
-      "RR": 16.0,
-      "Temp": 36.5,
-      "Lactate": 1.4
+      "HR": 97.0,
+      "RR": 27.0,
+      "Temp": 39.3,
+      "Lactate": 2.8
     },
-    "clinical_note": "Recovering well, progressing to regular diet. Routine physical exam normal. Recovering well, progressing to regular diet. Patient admitted for elective procedure. No signs of infection. Discharged home in stable condition. Discharged home in stable condition.",
-    "nlp_sepsis_score": 0.09137182844849429,
-    "alert_triggered": false,
-    "plan": [],
-    "execution_result": [],
-    "explanation": ""
+    "clinical_note": "No signs of infection. Discharged home in stable condition. Routine physical exam normal. Discharged home in stable condition. ICU admission for septic shock. Recovering well, progressing to regular diet. Lactate is elevated.",
+    "extracted_entities": [
+      {
+        "source_value": "septic",
+        "cui": "C0243026",
+        "cui_name": "Septicemia"
+      }
+    ],
+    "nlp_sepsis_score": 0.9,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "Evaluation Summary: The proposed treatment plan appropriately addresses the identified Sepsis and Hypotension conditions according to Sepsis-3 guidelines.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP003_002 (ID: ORD-8178, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_002 (ID: ORD-9661, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 97.0 (Importance: 0.64)\n- RR: 27.0 (Importance: 0.26)\n- Temp: 39.3 (Importance: 0.05)\n- Lactate: 2.8 (Importance: 0.04)\n"
   },
   {
     "subject_id": "P003",
     "visit_id": "EP003_003",
     "clinical_data": {
-      "HR": 83.0,
-      "RR": 16.0,
-      "Temp": 36.6,
-      "Lactate": 0
+      "HR": 104.0,
+      "RR": 22.0,
+      "Temp": 39.6,
+      "Lactate": 2.7
     },
-    "clinical_note": "Patient admitted for elective procedure. Patient admitted for elective procedure. Routine physical exam normal.",
-    "nlp_sepsis_score": 0.09807803724908558,
-    "alert_triggered": false,
-    "plan": [],
-    "execution_result": [],
-    "explanation": ""
-  },
-  {
-    "subject_id": "P003",
-    "visit_id": "EP003_004",
-    "clinical_data": {
-      "HR": 103.0,
-      "RR": 29.0,
-      "Temp": 39.3,
-      "Lactate": 0
-    },
-    "clinical_note": "Lactate is elevated. Hypotensive requiring vasopressors. Patient admitted for elective procedure.",
-    "nlp_sepsis_score": 0.8874721541647421,
+    "clinical_note": "Patient exhibits systemic inflammatory response syndrome. Lactate is elevated. No signs of infection.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
     "alert_triggered": true,
     "plan": [
       "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
+      "Administer 30mL/kg Crystalloid"
     ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
     "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP003_004 (ID: ORD-5029, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_004 (ID: ORD-7655, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP003_004 (ID: ORD-1729, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP003_004 (ID: ORD-7319, Status: success)"
+      "Order 'Order Lactate Redraw' placed for visit EP003_003 (ID: ORD-1372, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP003_003 (ID: ORD-4587, Status: success)"
     ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 103.0 (Importance: 0.67)\n- RR: 29.0 (Importance: 0.26)\n- Temp: 39.3 (Importance: 0.05)\n- Lactate: 0.0 (Importance: 0.02)\n"
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 104.0 (Importance: 0.77)\n- RR: 22.0 (Importance: 0.14)\n- Temp: 39.6 (Importance: 0.06)\n- Lactate: 2.7 (Importance: 0.04)\n"
   },
   {
     "subject_id": "P004",
     "visit_id": "EP004_000",
     "clinical_data": {
-      "HR": 80.0,
-      "RR": 16.0,
-      "Temp": 36.6,
-      "Lactate": 1.5
+      "HR": 120.0,
+      "RR": 24.0,
+      "Temp": 38.8,
+      "Lactate": 0
     },
-    "clinical_note": "Recovering well, progressing to regular diet. Routine physical exam normal. Vital signs are stable. No signs of infection. Recovering well, progressing to regular diet.",
-    "nlp_sepsis_score": 0.13029293941848447,
+    "clinical_note": "No signs of infection. Hypotension requiring vasopressors. Vital signs are stable. Lab results indicate lactic acidosis. No signs of infection. Patient admitted for elective procedure.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP004_000 (ID: ORD-1985, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP004_000 (ID: ORD-6400, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 120.0 (Importance: 0.82)\n- RR: 24.0 (Importance: 0.13)\n- Temp: 38.8 (Importance: 0.03)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P004",
+    "visit_id": "EP004_001",
+    "clinical_data": {
+      "HR": 119.0,
+      "RR": 24.0,
+      "Temp": 39.0,
+      "Lactate": 4.7
+    },
+    "clinical_note": "Lactate is elevated. Routine physical exam normal. Blood cultures positive for gram negative rods. Vital signs are stable. Routine physical exam normal.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP004_001 (ID: ORD-3986, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP004_001 (ID: ORD-8615, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 119.0 (Importance: 0.78)\n- RR: 24.0 (Importance: 0.13)\n- Lactate: 4.7 (Importance: 0.06)\n- Temp: 39.0 (Importance: 0.03)\n"
+  },
+  {
+    "subject_id": "P004",
+    "visit_id": "EP004_002",
+    "clinical_data": {
+      "HR": 68.0,
+      "RR": 20.0,
+      "Temp": 36.6,
+      "Lactate": 1.4
+    },
+    "clinical_note": "Discharged home in stable condition. Recovering well, progressing to regular diet. Routine physical exam normal.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -197,15 +285,41 @@
     "subject_id": "P005",
     "visit_id": "EP005_000",
     "clinical_data": {
-      "HR": 89.0,
-      "RR": 12.0,
-      "Temp": 37.1,
-      "Lactate": 0
+      "HR": 104.0,
+      "RR": 22.0,
+      "Temp": 39.9,
+      "Lactate": 2.9
     },
-    "clinical_note": "Discharged home in stable condition. Discharged home in stable condition. Routine physical exam normal.",
-    "nlp_sepsis_score": 0.0759962078198203,
+    "clinical_note": "Patient presents with severe sepsis. Hypotension requiring vasopressors. Discharged home in stable condition.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.9,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP005_000 (ID: ORD-6603, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP005_000 (ID: ORD-9881, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 104.0 (Importance: 0.76)\n- RR: 22.0 (Importance: 0.13)\n- Temp: 39.9 (Importance: 0.06)\n- Lactate: 2.9 (Importance: 0.04)\n"
+  },
+  {
+    "subject_id": "P005",
+    "visit_id": "EP005_001",
+    "clinical_data": {
+      "HR": 87.0,
+      "RR": 17.0,
+      "Temp": 37.2,
+      "Lactate": 1.1
+    },
+    "clinical_note": "Discharged home in stable condition. Patient admitted for elective procedure. Patient admitted for elective procedure. Discharged home in stable condition. Recovering well, progressing to regular diet. Routine physical exam normal. No signs of infection.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -213,31 +327,107 @@
     "subject_id": "P006",
     "visit_id": "EP006_000",
     "clinical_data": {
-      "HR": 95.0,
-      "RR": 29.0,
-      "Temp": 38.9,
-      "Lactate": 3.2
+      "HR": 97.0,
+      "RR": 22.0,
+      "Temp": 38.8,
+      "Lactate": 2.7
     },
-    "clinical_note": "Patient admitted for elective procedure. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. Discharged home in stable condition. Vital signs are stable. Recovering well, progressing to regular diet. No signs of infection. Discharged home in stable condition.",
-    "nlp_sepsis_score": 0.13275602336440265,
-    "alert_triggered": false,
-    "plan": [],
-    "execution_result": [],
-    "explanation": ""
+    "clinical_note": "Routine physical exam normal. No signs of infection. Recovering well, progressing to regular diet. Lab results indicate lactic acidosis. Hypotension requiring vasopressors. Routine physical exam normal. Routine physical exam normal.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP006_000 (ID: ORD-7925, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP006_000 (ID: ORD-7645, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 97.0 (Importance: 0.74)\n- RR: 22.0 (Importance: 0.16)\n- Temp: 38.8 (Importance: 0.05)\n- Lactate: 2.7 (Importance: 0.05)\n"
   },
   {
     "subject_id": "P006",
     "visit_id": "EP006_001",
     "clinical_data": {
-      "HR": 90.0,
-      "RR": 12.0,
-      "Temp": 37.2,
-      "Lactate": 1.2
+      "HR": 118.0,
+      "RR": 22.0,
+      "Temp": 38.1,
+      "Lactate": 0
     },
-    "clinical_note": "Routine physical exam normal. Recovering well, progressing to regular diet. Discharged home in stable condition. Vital signs are stable. No signs of infection. Vital signs are stable. Vital signs are stable.",
-    "nlp_sepsis_score": 0.11060332524761639,
+    "clinical_note": "Diagnosed with sepsis (ICD-9 995.92). Vital signs are stable. Routine physical exam normal. Hypotension requiring vasopressors. Patient admitted for elective procedure. Recovering well, progressing to regular diet. Vital signs are stable. Vital signs are stable.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.9,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP006_001 (ID: ORD-8722, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP006_001 (ID: ORD-2412, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 118.0 (Importance: 0.86)\n- RR: 22.0 (Importance: 0.11)\n- Temp: 38.1 (Importance: 0.02)\n- Lactate: 0.0 (Importance: 0.02)\n"
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_002",
+    "clinical_data": {
+      "HR": 79.0,
+      "RR": 17.0,
+      "Temp": 37.0,
+      "Lactate": 0
+    },
+    "clinical_note": "Vital signs are stable. Routine physical exam normal. No signs of infection. Recovering well, progressing to regular diet. Discharged home in stable condition.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_003",
+    "clinical_data": {
+      "HR": 120.0,
+      "RR": 26.0,
+      "Temp": 39.4,
+      "Lactate": 4.9
+    },
+    "clinical_note": "Discharged home in stable condition. Patient presents with severe sepsis. Diagnosed with sepsis (ICD-9 995.92).",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.5,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP006_003 (ID: ORD-8594, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP006_003 (ID: ORD-6310, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 120.0 (Importance: 0.75)\n- RR: 26.0 (Importance: 0.15)\n- Lactate: 4.9 (Importance: 0.06)\n- Temp: 39.4 (Importance: 0.04)\n"
+  },
+  {
+    "subject_id": "P006",
+    "visit_id": "EP006_004",
+    "clinical_data": {
+      "HR": 84.0,
+      "RR": 12.0,
+      "Temp": 36.6,
+      "Lactate": 1.1
+    },
+    "clinical_note": "Patient admitted for elective procedure. No signs of infection. No signs of infection. Routine physical exam normal. Routine physical exam normal. Patient admitted for elective procedure. Routine physical exam normal.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -245,15 +435,17 @@
     "subject_id": "P007",
     "visit_id": "EP007_000",
     "clinical_data": {
-      "HR": 82.0,
-      "RR": 17.0,
-      "Temp": 36.6,
-      "Lactate": 0.6
+      "HR": 67.0,
+      "RR": 18.0,
+      "Temp": 37.2,
+      "Lactate": 1.5
     },
-    "clinical_note": "Patient admitted for elective procedure. Discharged home in stable condition. No signs of infection. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. Discharged home in stable condition. Patient admitted for elective procedure. Discharged home in stable condition.",
-    "nlp_sepsis_score": 0.13735811613437415,
+    "clinical_note": "Vital signs are stable. No signs of infection. Recovering well, progressing to regular diet. No signs of infection. Patient admitted for elective procedure.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -261,15 +453,83 @@
     "subject_id": "P007",
     "visit_id": "EP007_001",
     "clinical_data": {
-      "HR": 81.0,
-      "RR": 18.0,
-      "Temp": 37.3,
+      "HR": 73.0,
+      "RR": 13.0,
+      "Temp": 36.9,
       "Lactate": 0
     },
-    "clinical_note": "No signs of infection. Discharged home in stable condition. Patient admitted for elective procedure. Vital signs are stable. Routine physical exam normal. Discharged home in stable condition. No signs of infection.",
-    "nlp_sepsis_score": 0.0826672457551838,
+    "clinical_note": "Patient admitted for elective procedure. Routine physical exam normal. Recovering well, progressing to regular diet. Vital signs are stable. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. Vital signs are stable. Discharged home in stable condition.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P007",
+    "visit_id": "EP007_002",
+    "clinical_data": {
+      "HR": 98.0,
+      "RR": 22.0,
+      "Temp": 38.1,
+      "Lactate": 2.6
+    },
+    "clinical_note": "Recovering well, progressing to regular diet. Patient presents with severe sepsis. Patient admitted for elective procedure. ICU admission for septic shock. Recovering well, progressing to regular diet.",
+    "extracted_entities": [
+      {
+        "source_value": "septic",
+        "cui": "C0243026",
+        "cui_name": "Septicemia"
+      }
+    ],
+    "nlp_sepsis_score": 0.9,
+    "alert_triggered": true,
+    "plan": [
+      "Order Lactate Redraw",
+      "Administer 30mL/kg Crystalloid"
+    ],
+    "evaluation_result": "Evaluation Summary: The proposed treatment plan appropriately addresses the identified Sepsis and Hypotension conditions according to Sepsis-3 guidelines.",
+    "execution_result": [
+      "Order 'Order Lactate Redraw' placed for visit EP007_002 (ID: ORD-1743, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP007_002 (ID: ORD-2073, Status: success)"
+    ],
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 98.0 (Importance: 0.76)\n- RR: 22.0 (Importance: 0.16)\n- Lactate: 2.6 (Importance: 0.04)\n- Temp: 38.1 (Importance: 0.03)\n"
+  },
+  {
+    "subject_id": "P007",
+    "visit_id": "EP007_003",
+    "clinical_data": {
+      "HR": 83.0,
+      "RR": 12.0,
+      "Temp": 37.4,
+      "Lactate": 0.8
+    },
+    "clinical_note": "Vital signs are stable. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. No signs of infection. Patient admitted for elective procedure. No signs of infection. Routine physical exam normal. Recovering well, progressing to regular diet.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
+    "execution_result": [],
+    "explanation": ""
+  },
+  {
+    "subject_id": "P007",
+    "visit_id": "EP007_004",
+    "clinical_data": {
+      "HR": 89.0,
+      "RR": 15.0,
+      "Temp": 36.8,
+      "Lactate": 0.8
+    },
+    "clinical_note": "Patient admitted for elective procedure. Discharged home in stable condition. Patient admitted for elective procedure. Discharged home in stable condition. Vital signs are stable. Discharged home in stable condition.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
+    "alert_triggered": false,
+    "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -277,91 +537,47 @@
     "subject_id": "P008",
     "visit_id": "EP008_000",
     "clinical_data": {
-      "HR": 119.0,
-      "RR": 30.0,
+      "HR": 106.0,
+      "RR": 23.0,
       "Temp": 39.5,
-      "Lactate": 3.8
-    },
-    "clinical_note": "ICU admission for septic shock. Patient presents with severe sepsis. Patient admitted for elective procedure. Discharged home in stable condition. No signs of infection.",
-    "nlp_sepsis_score": 0.6186817629753582,
-    "alert_triggered": true,
-    "plan": [
-      "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
-    ],
-    "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP008_000 (ID: ORD-7871, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_000 (ID: ORD-2919, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP008_000 (ID: ORD-7758, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP008_000 (ID: ORD-8180, Status: success)"
-    ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 119.0 (Importance: 0.72)\n- RR: 30.0 (Importance: 0.20)\n- Lactate: 3.8 (Importance: 0.04)\n- Temp: 39.5 (Importance: 0.04)\n"
-  },
-  {
-    "subject_id": "P008",
-    "visit_id": "EP008_001",
-    "clinical_data": {
-      "HR": 97.0,
-      "RR": 24.0,
-      "Temp": 38.4,
       "Lactate": 0
     },
-    "clinical_note": "Vital signs are stable. Routine physical exam normal. Blood cultures positive for gram negative rods. Patient presents with severe sepsis. Patient admitted for elective procedure. Discharged home in stable condition. Patient admitted for elective procedure. Routine physical exam normal.",
-    "nlp_sepsis_score": 0.5950494381062312,
+    "clinical_note": "Recovering well, progressing to regular diet. ICU admission for septic shock. No signs of infection. Vital signs are stable. Routine physical exam normal. Discharged home in stable condition. Hypotension requiring vasopressors.",
+    "extracted_entities": [
+      {
+        "source_value": "septic",
+        "cui": "C0243026",
+        "cui_name": "Septicemia"
+      }
+    ],
+    "nlp_sepsis_score": 0.9,
     "alert_triggered": true,
     "plan": [
       "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
+      "Administer 30mL/kg Crystalloid"
     ],
+    "evaluation_result": "Evaluation Summary: The proposed treatment plan appropriately addresses the identified Sepsis and Hypotension conditions according to Sepsis-3 guidelines.",
     "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP008_001 (ID: ORD-5043, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_001 (ID: ORD-9787, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP008_001 (ID: ORD-4486, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP008_001 (ID: ORD-5533, Status: success)"
+      "Order 'Order Lactate Redraw' placed for visit EP008_000 (ID: ORD-2777, Status: success)",
+      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_000 (ID: ORD-5123, Status: success)"
     ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 97.0 (Importance: 0.72)\n- RR: 24.0 (Importance: 0.21)\n- Temp: 38.4 (Importance: 0.04)\n- Lactate: 0.0 (Importance: 0.03)\n"
-  },
-  {
-    "subject_id": "P008",
-    "visit_id": "EP008_002",
-    "clinical_data": {
-      "HR": 110.0,
-      "RR": 30.0,
-      "Temp": 38.7,
-      "Lactate": 0
-    },
-    "clinical_note": "Vital signs are stable. Patient presents with severe sepsis. Hypotensive requiring vasopressors. Patient admitted for elective procedure.",
-    "nlp_sepsis_score": 0.8838455026638038,
-    "alert_triggered": true,
-    "plan": [
-      "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures"
-    ],
-    "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP008_002 (ID: ORD-2059, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP008_002 (ID: ORD-1024, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP008_002 (ID: ORD-4110, Status: success)"
-    ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 110.0 (Importance: 0.71)\n- RR: 30.0 (Importance: 0.25)\n- Temp: 38.7 (Importance: 0.03)\n- Lactate: 0.0 (Importance: 0.02)\n"
+    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 106.0 (Importance: 0.77)\n- RR: 23.0 (Importance: 0.15)\n- Temp: 39.5 (Importance: 0.05)\n- Lactate: 0.0 (Importance: 0.02)\n"
   },
   {
     "subject_id": "P009",
     "visit_id": "EP009_000",
     "clinical_data": {
-      "HR": 89.0,
-      "RR": 16.0,
+      "HR": 65.0,
+      "RR": 18.0,
       "Temp": 36.8,
-      "Lactate": 0
+      "Lactate": 0.9
     },
-    "clinical_note": "No signs of infection. Discharged home in stable condition. Patient admitted for elective procedure.",
-    "nlp_sepsis_score": 0.06642281496068232,
+    "clinical_note": "Vital signs are stable. Routine physical exam normal. No signs of infection. Routine physical exam normal. Recovering well, progressing to regular diet. Vital signs are stable.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -369,15 +585,17 @@
     "subject_id": "P009",
     "visit_id": "EP009_001",
     "clinical_data": {
-      "HR": 117.0,
-      "RR": 22.0,
-      "Temp": 38.3,
-      "Lactate": 4.2
+      "HR": 75.0,
+      "RR": 17.0,
+      "Temp": 37.0,
+      "Lactate": 1.2
     },
-    "clinical_note": "Blood cultures positive for gram negative rods. Blood cultures positive for gram negative rods. Vital signs are stable. Discharged home in stable condition. Recovering well, progressing to regular diet. Recovering well, progressing to regular diet. Patient admitted for elective procedure. Vital signs are stable.",
-    "nlp_sepsis_score": 0.3315254483424584,
+    "clinical_note": "Routine physical exam normal. Routine physical exam normal. Patient admitted for elective procedure. Vital signs are stable. Vital signs are stable. Routine physical exam normal. Patient admitted for elective procedure. Patient admitted for elective procedure.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
   },
@@ -385,66 +603,18 @@
     "subject_id": "P009",
     "visit_id": "EP009_002",
     "clinical_data": {
-      "HR": 73.0,
+      "HR": 81.0,
       "RR": 13.0,
-      "Temp": 37.3,
+      "Temp": 37.5,
       "Lactate": 0
     },
-    "clinical_note": "Vital signs are stable. Recovering well, progressing to regular diet. Vital signs are stable. Vital signs are stable. Routine physical exam normal. Vital signs are stable.",
-    "nlp_sepsis_score": 0.1317102306056872,
+    "clinical_note": "Patient admitted for elective procedure. Recovering well, progressing to regular diet. Routine physical exam normal. No signs of infection. No signs of infection. Patient admitted for elective procedure. No signs of infection. Vital signs are stable.",
+    "extracted_entities": [],
+    "nlp_sepsis_score": 0.1,
     "alert_triggered": false,
     "plan": [],
+    "evaluation_result": "",
     "execution_result": [],
     "explanation": ""
-  },
-  {
-    "subject_id": "P009",
-    "visit_id": "EP009_003",
-    "clinical_data": {
-      "HR": 109.0,
-      "RR": 25.0,
-      "Temp": 38.2,
-      "Lactate": 0
-    },
-    "clinical_note": "Discharged home in stable condition. ICU admission for septic shock. Diagnosed with sepsis (ICD-9 995.92). Patient admitted for elective procedure. No signs of infection.",
-    "nlp_sepsis_score": 0.8877260443657304,
-    "alert_triggered": true,
-    "plan": [
-      "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures"
-    ],
-    "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP009_003 (ID: ORD-9514, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP009_003 (ID: ORD-1643, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP009_003 (ID: ORD-8109, Status: success)"
-    ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 109.0 (Importance: 0.78)\n- RR: 25.0 (Importance: 0.18)\n- Temp: 38.2 (Importance: 0.02)\n- Lactate: 0.0 (Importance: 0.02)\n"
-  },
-  {
-    "subject_id": "P009",
-    "visit_id": "EP009_004",
-    "clinical_data": {
-      "HR": 96.0,
-      "RR": 30.0,
-      "Temp": 38.4,
-      "Lactate": 3.7
-    },
-    "clinical_note": "Diagnosed with sepsis (ICD-9 995.92). No signs of infection. Lactate is elevated. Patient admitted for elective procedure.",
-    "nlp_sepsis_score": 0.8360714111710166,
-    "alert_triggered": true,
-    "plan": [
-      "Order Lactate Redraw",
-      "Administer 30mL/kg Crystalloid",
-      "Order Blood Cultures",
-      "Administer Broad-Spectrum Antibiotics"
-    ],
-    "execution_result": [
-      "Order 'Order Lactate Redraw' placed for visit EP009_004 (ID: ORD-2614, Status: success)",
-      "Order 'Administer 30mL/kg Crystalloid' placed for visit EP009_004 (ID: ORD-3730, Status: success)",
-      "Order 'Order Blood Cultures' placed for visit EP009_004 (ID: ORD-6093, Status: success)",
-      "Order 'Administer Broad-Spectrum Antibiotics' placed for visit EP009_004 (ID: ORD-6912, Status: success)"
-    ],
-    "explanation": "Feature Importance Analysis (SHAP-proxy):\n- HR: 96.0 (Importance: 0.59)\n- RR: 30.0 (Importance: 0.32)\n- Lactate: 3.7 (Importance: 0.06)\n- Temp: 38.4 (Importance: 0.03)\n"
   }
 ]

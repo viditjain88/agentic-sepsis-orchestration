@@ -43,10 +43,21 @@ The architecture follows a modular pipeline:
 
 | Agent | Responsibility | Logic / Tech |
 | :--- | :--- | :--- |
-| **NLP Perceptor** | Analyzing unstructured data | `emilyalsentzer/Bio_ClinicalBERT` Sequence Classification |
+| **NLP Perceptor** | Analyzing unstructured data | `emilyalsentzer/Bio_ClinicalBERT` for Sequence Classification & **MedCAT** for Entity Extraction (CUI Mapping) |
 | **Planner** | Decision Making | LLM (Ollama/Gemma) + RAG (Guidelines) |
+| **Evaluator** | Plan Validation | LLM Judge comparing the treatment plan against MedCAT extracted CUI conditions |
 | **Executor** | Action | Mock FHIR API Interface |
 | **Verifier** | Explainability | Simulated SHAP Analysis |
+
+### 🧬 CUI Codes Extracted
+
+The NLP Perceptor pipeline specifically looks for text in clinical notes to map to the following UMLS CUI codes:
+- **C0243026** - Sepsis
+- **C1090680** - Severe Sepsis
+- **C0151744** - Septic Shock
+- **C0039082** - Systemic Inflammatory Response Syndrome (SIRS)
+- **C0020649** - Hypotension
+- **C0001125** - Lactic Acidosis
 
 ## 🛠️ Usage
 
@@ -59,7 +70,13 @@ The architecture follows a modular pipeline:
 # 1. Install Python dependencies
 pip install -r requirements.txt
 
-# 2. Install and start Ollama (if not already running)
+# 2. Download the required Spacy model for MedCAT
+python -m spacy download en_core_web_md
+
+# 3. Generate the local MedCAT Concept Database (CDB) and Vocabulary
+python medcat_setup.py
+
+# 4. Install and start Ollama (if not already running)
 # (See ollama.com for instructions)
 ollama pull gemma
 ```

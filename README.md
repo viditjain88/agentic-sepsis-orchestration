@@ -22,6 +22,13 @@ This Proof-of-Concept (PoC) demonstrates an agentic AI system for healthcare tha
 - New per-encounter `CLINICAL_NOTE` and `CELLULAR_DATA` fields
 - Cellular network graph schema exported as `{"nodes": [...], "links": [...]}`
 
+3.  **Agentic Orchestration:**
+    *   The core logic resides in `orchestrator.py`, built using **LangGraph**.
+    *   It manages the flow between four specialized agents:
+        *   **NLP Perceptor Agent:** Uses a Transformer-based sequence classification model (**Bio_ClinicalBERT**) to analyze unstructured clinical notes. It predicts the probability of sepsis presence based on the text.
+        *   **Planner Agent:** Uses **Ollama (Gemma)** and RAG (Sepsis Guidelines) to reason about the patient's condition and decompose the "Sepsis Bundle" into tasks, triggered when the NLP model detects high risk.
+        *   **Executor Agent:** Mocks a FHIR API to "place orders" (e.g., fluid bolus, antibiotics) and logs the actions.
+        *   **Verifier Agent:** Provides explainability by calculating feature importance (simulated SHAP values) for the alert.
 ### 2) Harmonization Upgrades (`harmonize_data.py`)
 - Added safe CSV loading (`load_csv`) and missing-file guardrails
 - Preserved `clinical_note` and parsed `cellular_data` into `harmonized_data.json`
@@ -32,6 +39,15 @@ This Proof-of-Concept (PoC) demonstrates an agentic AI system for healthcare tha
 2. **Threshold-based Sepsis-3 pattern matching** for risk scoring
 3. **MedCAT entity extraction** from unstructured clinical notes
 
+## 🤖 Agent Roles
+
+| Agent | Responsibility | Logic / Tech |
+| :--- | :--- | :--- |
+| **NLP Perceptor** | Analyzing unstructured data | `emilyalsentzer/Bio_ClinicalBERT` for Sequence Classification & **MedCAT** for Entity Extraction (CUI Mapping) |
+| **Planner** | Decision Making | LLM (Ollama/Gemma) + RAG (Guidelines) |
+| **Evaluator** | Plan Validation | LLM Judge comparing the treatment plan against MedCAT extracted CUI conditions |
+| **Executor** | Action | Mock FHIR API Interface |
+| **Verifier** | Explainability | Simulated SHAP Analysis |
 ### 4) Agent + API Expansion (`agents.py`, `backend/api.py`)
 - Added `TherapeuticsAgent` for cellular heat-signature-informed adjunct therapies
 - Added `EvaluatorAgent` (LLM-as-a-Judge style heuristic scoring)
@@ -129,6 +145,16 @@ We generated a synthetic cohort (200 patients, 629 encounters) and harmonized vi
 
 ---
 
+### 🧬 CUI Codes Extracted
+
+The NLP Perceptor pipeline specifically looks for text in clinical notes to map to the following UMLS CUI codes:
+- **C0243026** - Sepsis
+- **C1090680** - Severe Sepsis
+- **C0151744** - Septic Shock
+- **C0039082** - Systemic Inflammatory Response Syndrome (SIRS)
+- **C0020649** - Hypotension
+- **C0001125** - Lactic Acidosis
+
 ## 🛠️ Usage
 
 ### Prerequisites
@@ -138,6 +164,15 @@ We generated a synthetic cohort (200 patients, 629 encounters) and harmonized vi
 ### Installation
 ```bash
 pip install -r requirements.txt
+
+# 2. Download the required Spacy model for MedCAT
+python -m spacy download en_core_web_md
+
+# 3. Generate the local MedCAT Concept Database (CDB) and Vocabulary
+python medcat_setup.py
+
+# 4. Install and start Ollama (if not already running)
+# (See ollama.com for instructions)
 ollama pull gemma
 ```
 
@@ -159,6 +194,19 @@ python3 evaluate.py
 ---
 
 ## 📊 Results (200-Patient Cohort)
+
+**Agent Logs:**
+```
+INFO:__main__:--- NLP PERCEPTOR AGENT (Bio_ClinicalBERT) ---
+INFO:__main__:NLP Alert triggered with score 0.84 for P000
+INFO:__main__:--- PLANNER AGENT ---
+INFO:__main__:--- EXECUTOR AGENT ---
+INFO:agents:Order 'Order Lactate Redraw' placed (ID: ORD-2293, Status: success)
+INFO:agents:Order 'Administer 30mL/kg Crystalloid' placed (ID: ORD-9369, Status: success)
+INFO:agents:Order 'Order Blood Cultures' placed (ID: ORD-3136, Status: success)
+INFO:agents:Order 'Administer Broad-Spectrum Antibiotics' placed (ID: ORD-5631, Status: success)
+INFO:__main__:--- VERIFIER AGENT ---
+```
 
 | Metric | Value |
 |--------|-------|

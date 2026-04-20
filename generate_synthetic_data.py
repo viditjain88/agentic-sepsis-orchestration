@@ -126,11 +126,63 @@ def generate_synthetic_data(num_patients=200, output_dir='output'):
                 'DESCRIPTION': 'Lactate', 'VALUE': round(lactate_val, 1), 'UNITS': 'mmol/L', 'TYPE': 'numeric'})
     df_observations = pd.DataFrame(observations)
 
+    # 4. Clinical Notes Table (For NLP Model)
+    notes = []
+
+    sepsis_keywords = [
+        "Patient presents with severe sepsis.",
+        "Lactate is elevated.",
+        "Hypotension requiring vasopressors.",
+        "Blood cultures positive for gram negative rods.",
+        "ICU admission for septic shock.",
+        "Diagnosed with sepsis (ICD-9 995.92).",
+        "Patient exhibits systemic inflammatory response syndrome.",
+        "Lab results indicate lactic acidosis."
+    ]
+
+    normal_keywords = [
+        "Patient admitted for elective procedure.",
+        "Vital signs are stable.",
+        "Recovering well, progressing to regular diet.",
+        "No signs of infection.",
+        "Discharged home in stable condition.",
+        "Routine physical exam normal."
+    ]
+
+    for enc in encounters:
+        # Determine if this encounter is 'septic' based on the vitals generated above
+        enc_obs = [o for o in observations if o['ENCOUNTER'] == enc['Id']]
+        hr_obs = next((o for o in enc_obs if o['CODE'] == '8867-4'), None)
+        temp_obs = next((o for o in enc_obs if o['CODE'] == '8310-5'), None)
+
+        is_septic = False
+        if hr_obs and hr_obs['VALUE'] > 95 and temp_obs and temp_obs['VALUE'] > 38.0:
+            is_septic = True
+
+        note_length = random.randint(3, 8)
+        if is_septic:
+            note_parts = random.choices(sepsis_keywords, k=2) + random.choices(normal_keywords, k=note_length-2)
+        else:
+            note_parts = random.choices(normal_keywords, k=note_length)
+
+        random.shuffle(note_parts)
+        note_text = " ".join(note_parts)
+
+        notes.append({
+            'DATE': enc['START'],
+            'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'],
+            'TEXT': note_text
+        })
+
+    df_notes = pd.DataFrame(notes)
+
     os.makedirs(output_dir, exist_ok=True)
     df_patients.to_csv(f'{output_dir}/patients.csv', index=False)
     df_encounters.to_csv(f'{output_dir}/encounters.csv', index=False)
     df_observations.to_csv(f'{output_dir}/observations.csv', index=False)
-    print(f"Generated {num_patients} patients, {len(encounters)} encounters, {len(observations)} observations → {output_dir}/")
+    df_notes.to_csv(f'{output_dir}/notes.csv', index=False)
+    print(f"Generated {num_patients} patients, {len(encounters)} encounters, {len(observations)} observations, and {len(notes)} notes in {output_dir}/")
     return len(encounters)
 
 if __name__ == "__main__":

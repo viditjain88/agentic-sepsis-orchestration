@@ -25,13 +25,18 @@ def evaluate_performance(results_file='output/orchestration_results.json',
         is_septic = (data['HR'] > 95) and (data['Temp'] > 38.0 or data['Lactate'] > 2.5)
         y_true.append(1 if is_septic else 0)
 
-        # Risk score (Perceptor logic) normalised to [0,1]
-        score = 0
-        if data['HR'] > 90:       score += 1
-        if data['RR'] >= 22:      score += 1
-        if data['Temp'] > 38.0:   score += 1
-        if data['Lactate'] > 2.0: score += 2
-        y_scores.append(score / 5.0)
+        # Risk score (Perceptor logic) normalised to [0,1], fallback to nlp_sepsis_score if available
+        nlp_score = res.get('nlp_sepsis_score')
+        if nlp_score is not None:
+            score = float(nlp_score)
+        else:
+            score = 0
+            if data['HR'] > 90:       score += 1
+            if data['RR'] >= 22:      score += 1
+            if data['Temp'] > 38.0:   score += 1
+            if data['Lactate'] > 2.0: score += 2
+            score = score / 5.0
+        y_scores.append(score)
 
         # Latency: simulated (Planner LLM inference ~2-5s, Perceptor+Executor ~0.1s)
         if res['alert_triggered']:

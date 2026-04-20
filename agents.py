@@ -6,8 +6,52 @@ import numpy as np
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+try:
+    from medcat.vocab import Vocab
+    from medcat.cdb import CDB
+    from medcat.cat import CAT
+    from medcat.config import Config
+    MEDCAT_AVAILABLE = True
+except ImportError:
+    MEDCAT_AVAILABLE = False
 
 from medcat_processor import MedCATProcessor
+
+class MedCATPipeline:
+    """MedCAT entity extraction pipeline to identify Sepsis CUI codes."""
+
+    def __init__(self):
+        if MEDCAT_AVAILABLE:
+            try:
+                self.vocab = Vocab.load('output/medcat_models/vocab')
+                self.cdb = CDB.load('output/medcat_models/cdb')
+                self.config = Config()
+                self.config.general.spacy_model = 'en_core_web_md'
+                self.cat = CAT(self.cdb, vocab=self.vocab, config=self.config)
+            except Exception as e:
+                logger.error(f"Failed to load real MedCAT models. Did you run medcat_setup.py?: {e}")
+                self.cat = None
+        else:
+            logger.error("MedCAT libraries not found.")
+            self.cat = None
+
+    def get_entities(self, text: str) -> List[Dict[str, str]]:
+        if self.cat:
+            try:
+                entities = self.cat.get_entities(text)
+                results = []
+                for ent in entities['entities'].values():
+                    # get pretty name if available, otherwise fallback
+                    cui_name = ent.get('pretty_name', ent.get('cui', 'Unknown'))
+                    results.append({
+                        "source_value": ent['source_value'],
+                        "cui": ent['cui'],
+                        "cui_name": cui_name
+                    })
+                return results
+            except Exception as e:
+                logger.error(f"MedCAT extraction failed: {e}")
+        return []
 
 class PerceptorAgent:
     """
@@ -91,6 +135,42 @@ class PerceptorAgent:
 
         return alerts
 
+class EvaluatorAgent:
+    """Evaluates the generated treatment plan against the extracted CUI codes."""
+    def __init__(self, llm):
+        self.llm = llm
+
+    def evaluate(self, plan: List[str], cui_entities: List[Dict[str, str]]) -> str:
+        logger.info("--- EVALUATOR AGENT (LLM JUDGE) ---")
+        if not plan:
+            return "No plan generated to evaluate."
+
+        if not cui_entities:
+            return "No relevant CUI conditions found. Plan seems unprompted by explicit textual evidence."
+
+        conditions = ", ".join([f"{e['cui_name']} ({e['cui']})" for e in cui_entities])
+        plan_str = "\n".join([f"- {p}" for p in plan])
+
+        prompt = f"""
+        You are a medical evaluator agent (LLM Judge). Your task is to validate if a proposed treatment plan appropriately addresses the patient's conditions.
+
+        Identified Conditions (from MedCAT NLP):
+        {conditions}
+
+        Proposed Treatment Plan:
+        {plan_str}
+
+        Please analyze the plan. Does it adequately address the identified conditions? Are there any missing standard-of-care steps for these conditions? Provide a brief evaluation summary.
+        """
+
+        try:
+            response = self.llm.invoke(prompt)
+            # Depending on the LLM interface, response might be a string or an object
+            return str(response)
+        except Exception as e:
+            logger.error(f"LLM Evaluation failed: {e}")
+            return "Evaluation failed due to LLM error."
+
 
 class ExecutorAgent:
     """Simulates FHIR API order placement (mock)."""
@@ -132,49 +212,6 @@ class VerifierAgent:
         importance_dict = {self.FEATURES[i]: float(importance[i])
                            for i in range(len(self.FEATURES))}
         return explanation, importance_dict
-
-class EvaluatorAgent:
-    """
-    LLM as a Judge: Evaluates the pipeline outputs (extracted entities, treatment plan, etc.) 
-    against the raw clinical notes and provided inputs.
-    """
-    def evaluate(self, alert: Dict[str, Any], plan: List[str]) -> Dict[str, Any]:
-        # Mocking the LLM Judge evaluation process
-        # In a real scenario, this would send a prompt to an LLM like Gemma or GPT-4
-        # containing the clinical note, extracted entities, and the planner's output.
-        
-        extracted_entities = alert.get('extracted_entities', [])
-        note = alert.get('clinical_note', '')
-        
-        evaluation_score = 0
-        feedback = []
-        
-        # Simple heuristic to mock LLM scoring:
-        # Check if plan contains 'Lactate' if 'Lactate' entity was found, etc.
-        entity_names = [e['name'] for e in extracted_entities]
-        
-        if 'Sepsis' in entity_names and any('Broad-Spectrum Antibiotics' in p for p in plan):
-            evaluation_score += 40
-            feedback.append("Excellent alignment: Antibiotics ordered for suspected Sepsis.")
-        
-        if 'Lactate' in entity_names and any('Lactate Redraw' in p for p in plan):
-            evaluation_score += 20
-            feedback.append("Good alignment: Lactate redraw ordered corresponding to Lactate mention.")
-            
-        if not extracted_entities:
-            evaluation_score += 50 # Baseline if no entities found
-            feedback.append("Neutral: No specific entities extracted from notes to evaluate against.")
-        else:
-            evaluation_score += 40 # Base score for having a standard plan
-            feedback.append("Plan follows standard Sepsis-3 bundle appropriately.")
-            
-        final_score = min(100, evaluation_score)
-        
-        return {
-            "score": final_score,
-            "feedback": " ".join(feedback),
-            "alignment": "High" if final_score >= 80 else "Medium" if final_score >= 50 else "Low"
-        }
 
 class TherapeuticsAgent:
     """

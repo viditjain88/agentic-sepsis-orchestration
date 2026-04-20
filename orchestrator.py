@@ -1,111 +1,204 @@
 import json
 import random
 import logging
+from typing import List, Dict, Any, Union, TypedDict
+from langchain_community.llms import Ollama
+from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage
+from langgraph.graph import StateGraph, END
+from agents import PerceptorAgent, ExecutorAgent, EvaluatorAgent, VerifierAgent, MedCATPipeline
+from nlp_model_stub import FineTunedClinicalBERT
 import numpy as np
-from typing import List, Dict, Any
 
-logging.basicConfig(level=logging.WARNING)  # suppress INFO noise for 200-patient run
 
 # ── Agents ────────────────────────────────────────────────────────────────────
 
-class PerceptorAgent:
-    """LOINC-coded entity recognition + threshold-based pattern matching (Sepsis-3)."""
-    def monitor(self, patient_data):
-        alerts = []
-        subject_id = patient_data['subject_id']
-        for visit in patient_data['visits']:
-            hr = rr = temp = lactate = 0
-            for event in visit['events']:
-                if event['itemid'] == '8867-4':  hr      = event['valuenum']
-                elif event['itemid'] == '9279-1': rr      = event['valuenum']
-                elif event['itemid'] == '8310-5': temp    = event['valuenum']
-                elif event['itemid'] == '32693-4': lactate = event['valuenum']
+# Load RAG content (Guidelines)
+with open('sepsis_guidelines.txt', 'r') as f:
+    guidelines_text = f.read()
 
-            risk_score = 0
-            reasons = []
-            if hr > 90:       risk_score += 1; reasons.append(f"HR {hr} > 90")
-            if rr >= 22:      risk_score += 1; reasons.append(f"RR {rr} >= 22")
-            if temp > 38.0:   risk_score += 1; reasons.append(f"Temp {temp} > 38.0")
-            if lactate > 2.0: risk_score += 2; reasons.append(f"Lactate {lactate} > 2.0")
+# Fallback mechanism if Ollama is not running in CI
+class MockOllama:
+    def invoke(self, prompt: str) -> str:
+        if "evaluator agent" in prompt.lower():
+            return "Evaluation Summary: The proposed treatment plan appropriately addresses the identified Sepsis and Hypotension conditions according to Sepsis-3 guidelines."
+        return '["Order Lactate Redraw", "Administer 30mL/kg Crystalloid"]'
 
-            if risk_score >= 2:
-                alerts.append({
-                    'subject_id': subject_id,
-                    'visit_id': visit['hadm_id'],
-                    'risk_score': risk_score,
-                    'reasons': reasons,
-                    'timestamp': visit['admittime'],
-                    'clinical_data': {'HR': hr, 'RR': rr, 'Temp': temp, 'Lactate': lactate}
-                })
-        return alerts
+try:
+    import requests
+    requests.get('http://localhost:11434/api/tags', timeout=1)
+    llm = Ollama(model="gemma")
+except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+    logger.warning("Ollama not reachable, using MockOllama for CI testing.")
+    llm = MockOllama()
 
+# Initialize NLP Model (Method 3)
+nlp_model = FineTunedClinicalBERT()
 
-from agents import TherapeuticsAgent
+# Initialize MedCAT Pipeline
+medcat_pipeline = MedCATPipeline()
 
-class PlannerAgent:
-    """RAG + LLM (Ollama/Gemma) — LLM mocked for offline execution; logic identical."""
-    SEPSIS_BUNDLE = [
-        "Order Lactate Redraw",
-        "Administer 30mL/kg Crystalloid",
-        "Order Blood Cultures",
-        "Administer Broad-Spectrum Antibiotics"
-    ]
-    
-    def __init__(self):
-        self.therapeutics_agent = TherapeuticsAgent()
-        
-    def plan(self, clinical_data, cellular_data=None):
-        # In production: Ollama(model="gemma") + RAG over sepsis_guidelines.txt
-        # Mocked here (no network) — returns the same bundle the LLM consistently produces
-        base_plan = list(self.SEPSIS_BUNDLE)
-        
-        if cellular_data:
-            # Generate advanced therapies from TherapeuticsAgent
-            advanced_therapies = self.therapeutics_agent.predict_therapies(cellular_data)
-            base_plan.extend(advanced_therapies)
-            
-        return base_plan
+# State Management
+class AgentState(TypedDict):
+    messages: List[Union[HumanMessage, SystemMessage]]
+    subject_id: str
+    visit_id: str
+    clinical_data: Dict[str, Any]
+    clinical_note: str
+    extracted_entities: List[Dict[str, str]]
+    nlp_sepsis_score: float
+    alert_triggered: bool
+    plan: List[str]
+    evaluation_result: str
+    execution_result: List[str]
+    explanation: str
 
+# 1. NLP Perceptor Node (Method 3 + MedCAT)
+def nlp_perceptor_node(state: AgentState):
+    logger.info("--- NLP PERCEPTOR AGENT (Bio_ClinicalBERT & MedCAT) ---")
+    note = state.get('clinical_note', '')
 
-class ExecutorAgent:
-    """Mock FHIR API order placement."""
-    def execute_orders(self, orders, visit_id):
-        results = []
-        for order in orders:
-            order_id = f"ORD-{random.randint(1000, 9999)}"
-            results.append(f"Order '{order}' placed for {visit_id} (ID: {order_id}, Status: success)")
-        return results
+    # Extract entities using MedCAT
+    entities = medcat_pipeline.get_entities(note)
 
+    # Use the NLP model to predict sepsis probability
+    score = nlp_model.predict_sepsis_probability(note)
 
-class VerifierAgent:
-    """SHAP-proxy: importance via normalised deviation from clinical baseline."""
-    BASELINE = np.array([70, 16, 37.0, 1.0])  # HR, RR, Temp, Lactate
+    # Trigger alert if score is high OR if we found severe sepsis / septic shock concepts
+    critical_cuis = {"C1090680", "C0151744"} # Severe Sepsis, Septic Shock
+    found_critical_cui = any(ent['cui'] in critical_cuis for ent in entities)
 
-    def explain(self, clinical_data):
-        values = np.array([clinical_data['HR'], clinical_data['RR'],
-                           clinical_data['Temp'], clinical_data['Lactate']])
-        importance = np.abs(values - self.BASELINE)
-        if importance.sum() > 0:
-            importance = importance / importance.sum()
-        features = ['HR', 'RR', 'Temp', 'Lactate']
-        sorted_idx = np.argsort(importance)[::-1]
-        explanation = "Feature Importance (SHAP-proxy):\n"
-        for idx in sorted_idx:
-            explanation += f"  - {features[idx]}: {values[idx]} (Importance: {importance[idx]:.2f})\n"
-        return explanation, {features[i]: float(importance[i]) for i in range(4)}
+    triggered = score >= 0.5 or found_critical_cui
 
+    if triggered:
+        logger.info(f"NLP Alert triggered for {state['subject_id']} (Score: {score:.2f}, Entities found: {len(entities)})")
 
-# ── Orchestrator ──────────────────────────────────────────────────────────────
+    return {"nlp_sepsis_score": score, "extracted_entities": entities, "alert_triggered": triggered}
 
-def run_orchestrator(patient_file='output/harmonized_data.json',
-                     out_file='output/orchestration_results.json'):
-    with open(patient_file, 'r') as f:
-        patients = json.load(f)
+# 2. Planner Node (RAG + LLM)
+def planner_node(state: AgentState):
+    logger.info("--- PLANNER AGENT ---")
+    if not state['alert_triggered']:
+        return {"plan": []}
 
-    perceptor = PerceptorAgent()
-    planner   = PlannerAgent()
-    executor  = ExecutorAgent()
-    verifier  = VerifierAgent()
+    # RAG Context
+    context = guidelines_text
+
+    # Prompt
+    prompt = f"""
+    You are a medical planner agent. Based on the following Sepsis-3 guidelines and the patient's data, generate a list of specific clinical orders to be executed.
+
+    Guidelines:
+    {context}
+
+    Patient Data:
+    HR: {state['clinical_data']['HR']}
+    RR: {state['clinical_data']['RR']}
+    Temp: {state['clinical_data']['Temp']}
+    Lactate: {state['clinical_data']['Lactate']}
+
+    Output ONLY a JSON list of strings representing the orders (e.g., ["Order Lactate Redraw", "Administer 30mL/kg Crystalloid"]). Do not include any other text.
+    """
+
+    response = llm.invoke(prompt)
+
+    # Parse LLM response (robustness check needed in prod)
+    try:
+        # Simple string cleaning to extract the list
+        start = response.find('[')
+        end = response.rfind(']') + 1
+        if start != -1 and end != -1:
+            plan_json = response[start:end]
+            plan = json.loads(plan_json)
+        else:
+            plan = ["Consult Specialist (Parse Error)"]
+    except Exception as e:
+        logger.error(f"Failed to parse plan: {e}")
+        plan = ["Consult Specialist (JSON Error)"]
+
+    return {"plan": plan}
+
+# 3. Evaluator Node (LLM Judge)
+def evaluator_node(state: AgentState):
+    logger.info("--- EVALUATOR AGENT (LLM Judge) ---")
+    if not state['plan']:
+        return {"evaluation_result": "No plan to evaluate."}
+
+    evaluator = EvaluatorAgent(llm=llm)
+    result = evaluator.evaluate(state['plan'], state['extracted_entities'])
+    return {"evaluation_result": result}
+
+# 4. Executor Node
+def executor_node(state: AgentState):
+    logger.info("--- EXECUTOR AGENT ---")
+    if not state['plan']:
+        return {"execution_result": ["No actions required."]}
+
+    executor = ExecutorAgent()
+    results = executor.execute_orders(state['plan'], state['visit_id'])
+    return {"execution_result": results}
+
+# 5. Verifier Node
+def verifier_node(state: AgentState):
+    logger.info("--- VERIFIER AGENT ---")
+    if not state['alert_triggered']:
+        return {"explanation": "No sepsis alert triggered."}
+
+    verifier = VerifierAgent()
+    # Create the alert structure needed by Verifier
+    alert = {
+        'clinical_data': state['clinical_data']
+    }
+    explanation = verifier.explain(alert)
+    return {"explanation": explanation}
+
+# Build the Graph
+def create_agent_graph():
+    workflow = StateGraph(AgentState)
+
+    # Add Nodes
+    workflow.add_node("nlp_perceptor", nlp_perceptor_node)
+    workflow.add_node("planner", planner_node)
+    workflow.add_node("evaluator", evaluator_node)
+    workflow.add_node("executor", executor_node)
+    workflow.add_node("verifier", verifier_node)
+
+    # Add Edges
+    workflow.set_entry_point("nlp_perceptor")
+
+    # Conditional logic after Perceptor
+    def should_continue(state: AgentState):
+        if state['alert_triggered']:
+            return "planner"
+        else:
+            return END
+
+    workflow.add_conditional_edges(
+        "nlp_perceptor",
+        should_continue,
+        {
+            "planner": "planner",
+            END: END
+        }
+    )
+
+    workflow.add_edge("planner", "evaluator")
+    workflow.add_edge("evaluator", "executor")
+    workflow.add_edge("executor", "verifier")
+    workflow.add_edge("verifier", END)
+
+    return workflow.compile()
+
+# Orchestrator Function
+def run_orchestrator(patient_file='output/harmonized_data.json'):
+    try:
+        with open(patient_file, 'r') as f:
+            patients = json.load(f)
+    except FileNotFoundError:
+        print("Data file not found.")
+        return
+
+    app = create_agent_graph()
 
     all_results = []
     alert_count = 0
@@ -119,44 +212,49 @@ def run_orchestrator(patient_file='output/harmonized_data.json',
             temp    = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '8310-5'), 0)
             lactate = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '32693-4'), 0)
 
-            clinical_data = {'HR': hr, 'RR': rr, 'Temp': temp, 'Lactate': lactate}
+            # Extract clinical note
+            notes = visit.get('clinical_notes', [])
+            note_text = notes[0]['text'] if len(notes) > 0 else "No clinical note available."
 
-            # Perceptor
-            patient_input = {'subject_id': patient['subject_id'], 'visits': [visit]}
-            alerts = perceptor.monitor(patient_input)
-            alert_triggered = len(alerts) > 0
+            initial_state = {
+                "subject_id": patient['subject_id'],
+                "visit_id": visit['hadm_id'],
+                "clinical_data": {
+                    "HR": hr,
+                    "RR": rr,
+                    "Temp": temp,
+                    "Lactate": lactate
+                },
+                "clinical_note": note_text,
+                "extracted_entities": [],
+                "nlp_sepsis_score": 0.0,
+                "alert_triggered": False,
+                "plan": [],
+                "evaluation_result": "",
+                "execution_result": [],
+                "explanation": ""
+            }
 
-            plan = []
-            execution_result = []
-            explanation = ""
-            shap_importance = {}
+            # Run the graph
+            result = app.invoke(initial_state)
+            all_results.append(result)
 
-            if alert_triggered:
-                alert_count += 1
-                # Planner
-                plan = planner.plan(clinical_data, cellular_data=visit.get('cellular_data'))
-                # Executor
-                execution_result = executor.execute_orders(plan, visit['hadm_id'])
-                # Verifier
-                explanation, shap_importance = verifier.explain(clinical_data)
+            # Output for this patient
+            if result['alert_triggered']:
+                print(f"\n--- Result for Patient {result['subject_id']} (Visit {result['visit_id']}) ---")
+                print(f"Alert: YES")
+                print(f"Extracted CUI Entities: {result['extracted_entities']}")
+                print(f"Plan: {result['plan']}")
+                print(f"LLM Judge Evaluation:\n{result['evaluation_result']}")
+                print(f"Execution: {result['execution_result']}")
+                print(f"Explanation:\n{result['explanation']}")
+            else:
+                pass
 
-            all_results.append({
-                'subject_id': patient['subject_id'],
-                'visit_id': visit['hadm_id'],
-                'clinical_data': clinical_data,
-                'alert_triggered': alert_triggered,
-                'plan': plan,
-                'execution_result': execution_result,
-                'explanation': explanation,
-                'shap_importance': shap_importance
-            })
-
-    with open(out_file, 'w') as f:
-        json.dump(all_results, f, indent=2)
-
-    print(f"Orchestration complete: {len(patients)} patients | {total_visits} visits | {alert_count} alerts triggered")
-    return all_results
-
+    # Save all results for evaluation
+    with open('output/orchestration_results.json', 'w') as f:
+        # Convert non-serializable objects to string/dict representation if necessary
+        json.dump(all_results, f, default=str, indent=2)
 
 if __name__ == "__main__":
     results = run_orchestrator()

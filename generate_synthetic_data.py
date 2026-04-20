@@ -1,12 +1,67 @@
 import pandas as pd
 import numpy as np
 import random
+import os
 from datetime import datetime, timedelta
+import urllib.request
+import zipfile
+import json
+import logging
 
-def generate_synthetic_data(num_patients=10, output_dir='output'):
-    """Generates synthetic patient data mimicking Synthea output."""
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-    # 1. Patients Table
+random.seed(42)
+np.random.seed(42)
+
+def download_clinical_notes_dataset():
+    logger.info("Attempting to load clinical notes dataset from HuggingFace...")
+    try:
+        from datasets import load_dataset
+        ds = load_dataset('starmpcc/Asclepius-Synthetic-Clinical-Notes', split='train')
+        logger.info(f"Loaded {len(ds)} clinical notes.")
+        return ds
+    except Exception as e:
+        logger.warning(f"Failed to load dataset: {e}. Will generate fallback notes.")
+        return None
+
+def generate_cellular_data():
+    genes = ['BRCA1', 'TP53', 'TNF', 'IL6', 'EGFR', 'MYC', 'VEGFA', 'PTEN', 'PIK3CA', 'BRAF']
+    proteins = ['p53', 'TNF-alpha', 'IL-6', 'EGFR', 'c-Myc', 'VEGF', 'PTEN', 'PI3K', 'B-Raf', 'AKT']
+    pathways = ['Apoptosis', 'Inflammation', 'Cell Cycle', 'Angiogenesis', 'MAPK', 'PI3K-AKT']
+
+    n_genes = random.randint(3, 7)
+    selected_genes = random.sample(genes, n_genes)
+    selected_proteins = random.sample(proteins, n_genes)
+    selected_pathways = random.sample(pathways, random.randint(2, 4))
+    
+    nodes = []
+    edges = []
+    
+    for g in selected_genes:
+        expr = random.uniform(-3.0, 3.0)
+        nodes.append({'id': g, 'type': 'gene', 'expression': round(expr, 2), 'heat': abs(expr) / 3.0})
+        
+    for p in selected_proteins:
+        expr = random.uniform(-3.0, 3.0)
+        nodes.append({'id': p, 'type': 'protein', 'expression': round(expr, 2), 'heat': abs(expr) / 3.0})
+        
+    for p in selected_pathways:
+        nodes.append({'id': p, 'type': 'pathway', 'heat': random.uniform(0.1, 1.0)})
+        
+    # Generate random edges between genes, proteins, pathways
+    all_ids = [n['id'] for n in nodes]
+    for _ in range(random.randint(n_genes, n_genes*3)):
+        source = random.choice(all_ids)
+        target = random.choice(all_ids)
+        if source != target:
+            edges.append({'source': source, 'target': target, 'weight': round(random.uniform(-1.0, 1.0), 2)})
+            
+    return {'nodes': nodes, 'links': edges}
+
+def generate_synthetic_data(num_patients=200, output_dir='output'):
+    ds = download_clinical_notes_dataset()
+    
     patients = []
     for i in range(num_patients):
         patient_id = f"P{i:03d}"
@@ -16,32 +71,13 @@ def generate_synthetic_data(num_patients=10, output_dir='output'):
             'Id': patient_id,
             'BIRTHDATE': birthdate.strftime('%Y-%m-%d'),
             'DEATHDATE': None,
-            'SSN': f"999-{random.randint(10,99)}-{random.randint(1000,9999)}",
-            'DRIVERS': f"S{random.randint(10000000,99999999)}",
-            'PASSPORT': f"N{random.randint(10000000,99999999)}",
-            'PREFIX': 'Mr.' if gender == 'M' else 'Ms.',
-            'FIRST': f"First{i}",
-            'LAST': f"Last{i}",
-            'SUFFIX': None,
-            'MAIDEN': None,
-            'MARITAL': random.choice(['M', 'S']),
+            'GENDER': gender,
             'RACE': random.choice(['white', 'black', 'asian', 'hispanic']),
             'ETHNICITY': random.choice(['nonhispanic', 'hispanic']),
-            'GENDER': gender,
-            'BIRTHPLACE': 'Boston',
-            'ADDRESS': '123 Main St',
-            'CITY': 'Boston',
-            'STATE': 'MA',
-            'COUNTY': 'Suffolk',
-            'ZIP': '02115',
-            'LAT': 42.3601,
-            'LON': -71.0589,
-            'HEALTHCARE_EXPENSES': random.uniform(1000, 50000),
-            'HEALTHCARE_COVERAGE': random.uniform(500, 10000)
+            'CITY': 'Boston', 'STATE': 'MA',
         })
     df_patients = pd.DataFrame(patients)
 
-    # 2. Encounters Table
     encounters = []
     for p in patients:
         num_encounters = random.randint(1, 5)
@@ -49,84 +85,45 @@ def generate_synthetic_data(num_patients=10, output_dir='output'):
             encounter_id = f"E{p['Id']}_{j:03d}"
             start_time = datetime.now() - timedelta(days=random.randint(1, 365))
             stop_time = start_time + timedelta(hours=random.randint(1, 48))
+            
+            note_text = ""
+            if ds is not None:
+                note_idx = random.randint(0, len(ds)-1)
+                note_text = ds[note_idx]['note']
+            else:
+                note_text = f"Patient {p['Id']} admitted for observation. Vitals monitored."
+                
             encounters.append({
                 'Id': encounter_id,
                 'START': start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'STOP': stop_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'PATIENT': p['Id'],
-                'ORGANIZATION': 'General Hospital',
-                'PROVIDER': 'Dr. Smith',
-                'PAYER': 'Blue Cross',
                 'ENCOUNTERCLASS': 'inpatient',
-                'CODE': '185345009',
-                'DESCRIPTION': 'Encounter for symptom',
-                'BASE_ENCOUNTER_COST': random.uniform(100, 5000),
-                'TOTAL_CLAIM_COST': random.uniform(100, 5000),
-                'PAYER_COVERAGE': random.uniform(50, 4000),
-                'REASONCODE': None,
-                'REASONDESCRIPTION': None
+                'CLINICAL_NOTE': note_text,
+                'CELLULAR_DATA': json.dumps(generate_cellular_data())
             })
     df_encounters = pd.DataFrame(encounters)
 
-    # 3. Observations Table (Vitals & Labs)
     observations = []
     for enc in encounters:
-        # Generate sepsis-indicative values for some patients
         is_septic = random.choice([True, False])
-
-        # Heart Rate
-        hr_val = random.randint(95, 120) if is_septic else random.randint(60, 90)
-        observations.append({
-            'DATE': enc['START'],
-            'PATIENT': enc['PATIENT'],
-            'ENCOUNTER': enc['Id'],
-            'CODE': '8867-4',
-            'DESCRIPTION': 'Heart rate',
-            'VALUE': hr_val,
-            'UNITS': 'beats/min',
-            'TYPE': 'numeric'
-        })
-
-        # Respiratory Rate
-        rr_val = random.randint(22, 30) if is_septic else random.randint(12, 20)
-        observations.append({
-            'DATE': enc['START'],
-            'PATIENT': enc['PATIENT'],
-            'ENCOUNTER': enc['Id'],
-            'CODE': '9279-1',
-            'DESCRIPTION': 'Respiratory rate',
-            'VALUE': rr_val,
-            'UNITS': 'breaths/min',
-            'TYPE': 'numeric'
-        })
-
-        # Temperature
-        temp_val = random.uniform(38.0, 40.0) if is_septic else random.uniform(36.5, 37.5)
-        observations.append({
-            'DATE': enc['START'],
-            'PATIENT': enc['PATIENT'],
-            'ENCOUNTER': enc['Id'],
-            'CODE': '8310-5',
-            'DESCRIPTION': 'Body temperature',
-            'VALUE': round(temp_val, 1),
-            'UNITS': 'Cel',
-            'TYPE': 'numeric'
-        })
-
-        # Lactate (Lab)
-        if random.random() > 0.5: # Not all encounters have labs immediately
-            lactate_val = random.uniform(2.5, 5.0) if is_septic else random.uniform(0.5, 1.5)
-            observations.append({
-                'DATE': enc['START'],
-                'PATIENT': enc['PATIENT'],
-                'ENCOUNTER': enc['Id'],
-                'CODE': '32693-4',
-                'DESCRIPTION': 'Lactate [Moles/volume] in Blood',
-                'VALUE': round(lactate_val, 1),
-                'UNITS': 'mmol/L',
-                'TYPE': 'numeric'
-            })
-
+        hr_val = random.randint(95, 130) if is_septic else random.randint(55, 90)
+        observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'], 'CODE': '8867-4',
+            'DESCRIPTION': 'Heart rate', 'VALUE': hr_val, 'UNITS': 'beats/min', 'TYPE': 'numeric'})
+        rr_val = random.randint(22, 32) if is_septic else random.randint(10, 20)
+        observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'], 'CODE': '9279-1',
+            'DESCRIPTION': 'Respiratory rate', 'VALUE': rr_val, 'UNITS': 'breaths/min', 'TYPE': 'numeric'})
+        temp_val = random.uniform(38.1, 40.5) if is_septic else random.uniform(36.2, 37.5)
+        observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+            'ENCOUNTER': enc['Id'], 'CODE': '8310-5',
+            'DESCRIPTION': 'Body temperature', 'VALUE': round(temp_val, 1), 'UNITS': 'Cel', 'TYPE': 'numeric'})
+        if random.random() > 0.3:
+            lactate_val = random.uniform(2.5, 6.0) if is_septic else random.uniform(0.4, 1.8)
+            observations.append({'DATE': enc['START'], 'PATIENT': enc['PATIENT'],
+                'ENCOUNTER': enc['Id'], 'CODE': '32693-4',
+                'DESCRIPTION': 'Lactate', 'VALUE': round(lactate_val, 1), 'UNITS': 'mmol/L', 'TYPE': 'numeric'})
     df_observations = pd.DataFrame(observations)
 
     # 4. Clinical Notes Table (For NLP Model)
@@ -180,16 +177,13 @@ def generate_synthetic_data(num_patients=10, output_dir='output'):
 
     df_notes = pd.DataFrame(notes)
 
-    # Save to CSV
-    import os
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
+    os.makedirs(output_dir, exist_ok=True)
     df_patients.to_csv(f'{output_dir}/patients.csv', index=False)
     df_encounters.to_csv(f'{output_dir}/encounters.csv', index=False)
     df_observations.to_csv(f'{output_dir}/observations.csv', index=False)
     df_notes.to_csv(f'{output_dir}/notes.csv', index=False)
     print(f"Generated {num_patients} patients, {len(encounters)} encounters, {len(observations)} observations, and {len(notes)} notes in {output_dir}/")
+    return len(encounters)
 
 if __name__ == "__main__":
-    generate_synthetic_data()
+    generate_synthetic_data(200)

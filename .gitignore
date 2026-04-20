@@ -3,3 +3,10 @@ __pycache__/
 *.log
 install_ollama.sh
 synthea-with-dependencies.jar
+.DS_Store
+.vscode/
+frontend/node_modules/
+jules_session_*/
+fix_graph.diff
+fix_graph2.diff
+replace_agents.diff

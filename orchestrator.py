@@ -1,4 +1,5 @@
 import json
+import random
 import logging
 from typing import List, Dict, Any, Union, TypedDict
 from langchain_community.llms import Ollama
@@ -7,10 +8,10 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import StateGraph, END
 from agents import PerceptorAgent, ExecutorAgent, EvaluatorAgent, VerifierAgent, MedCATPipeline
 from nlp_model_stub import FineTunedClinicalBERT
+import numpy as np
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+# ── Agents ────────────────────────────────────────────────────────────────────
 
 # Load RAG content (Guidelines)
 with open('sepsis_guidelines.txt', 'r') as f:
@@ -200,13 +201,15 @@ def run_orchestrator(patient_file='output/harmonized_data.json'):
     app = create_agent_graph()
 
     all_results = []
+    alert_count = 0
+    total_visits = 0
 
     for patient in patients:
         for visit in patient['visits']:
-            # Prepare initial state
-            hr = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '8867-4'), 0)
-            rr = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '9279-1'), 0)
-            temp = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '8310-5'), 0)
+            total_visits += 1
+            hr      = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '8867-4'), 0)
+            rr      = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '9279-1'), 0)
+            temp    = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '8310-5'), 0)
             lactate = next((e['valuenum'] for e in visit['events'] if e['itemid'] == '32693-4'), 0)
 
             # Extract clinical note
@@ -254,4 +257,4 @@ def run_orchestrator(patient_file='output/harmonized_data.json'):
         json.dump(all_results, f, default=str, indent=2)
 
 if __name__ == "__main__":
-    run_orchestrator()
+    results = run_orchestrator()
